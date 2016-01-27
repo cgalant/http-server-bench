@@ -28,7 +28,7 @@ import java.nio.ByteBuffer;
  * An implementation of the TechEmpower benchmark tests using the Jetty web
  * server.  
  */
-public final class JettyTechem 
+public final class JettyHandler 
 {
     public static void main(String[] args) throws Exception
     {

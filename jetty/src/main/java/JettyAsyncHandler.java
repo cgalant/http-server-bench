@@ -23,7 +23,7 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.util.BufferUtil;
 
-public class JettyAsync2 extends AbstractHandler {
+public class JettyAsyncHandler extends AbstractHandler {
     int num = 0;
     AsyncContext [] ac1=new AsyncContext[100000], ac2=new AsyncContext[100000],
             acv=ac1, copy=ac2;
@@ -96,7 +96,7 @@ public class JettyAsync2 extends AbstractHandler {
     
     public static void main(String[] args) throws Exception {
         Server server = new Server(9092);
-        server.setHandler(new JettyAsync2());
+        server.setHandler(new JettyAsyncHandler());
         server.start();
     }
 

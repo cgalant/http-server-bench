@@ -16,7 +16,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 // 9091
 // async by default, any cmd-line-arg for not async
 
-public class JettyAsync extends HttpServlet
+public class JettyAsyncServlet extends HttpServlet
 {
     final static String RESULTS_ATTR = "org.eclipse.jetty.demo.client";
     final boolean useasync;
@@ -24,7 +24,7 @@ public class JettyAsync extends HttpServlet
     int num = 0;
     AsyncContext acv[] = new AsyncContext[1000000];
 
-    public JettyAsync(boolean async) {
+    public JettyAsyncServlet(boolean async) {
         useasync = async;
     }
 
@@ -66,7 +66,7 @@ public class JettyAsync extends HttpServlet
     }
     
     static Server setup(int port,boolean async) throws Exception {
-        JettyAsync rest = new JettyAsync(async);
+        JettyAsyncServlet rest = new JettyAsyncServlet(async);
         Timer timer = new Timer();
         if (rest.useasync) timer.schedule(new TimerTask() { public void run() {
             rest.store(null);

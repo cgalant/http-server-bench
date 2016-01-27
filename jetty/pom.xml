@@ -4,25 +4,29 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.techempower</groupId>
-    <artifactId>jetty-example</artifactId>
+    <artifactId>jetty</artifactId>
     <version>0.1</version>
+
+    <properties>
+        <jetty.version>9.3.6.v20151106</jetty.version>
+    </properties>
 
     <dependencies>
         <!-- Web server -->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.3.0.v20150612</version>
+            <version>${jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-util-ajax</artifactId>
-            <version>9.3.0.v20150612</version>
+            <version>${jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
-            <version>9.3.0.v20150612</version>
+            <version>${jetty.version}</version>
         </dependency>
     </dependencies>
 
