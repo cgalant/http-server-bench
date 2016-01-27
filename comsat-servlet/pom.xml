@@ -4,37 +4,51 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.techempower</groupId>
-    <artifactId>jetty-example</artifactId>
+    <artifactId>comsat-servlet</artifactId>
     <version>0.1</version>
+
+    <properties>
+        <quasar.version>0.7.4</quasar.version>
+        <comsat.version>0.5.0</comsat.version>
+        <!--jetty.version>9.3.0.v20150612</jetty.version-->
+        <!--jetty.version>9.2.14.v20151106</jetty.version-->
+        <jetty.version>9.3.6.v20151106</jetty.version>
+    </properties>
 
     <dependencies>
         <!-- Web server -->
         <dependency>
             <groupId>co.paralleluniverse</groupId>
             <artifactId>quasar-core</artifactId>
-            <version>0.7.2</version>
+            <version>${quasar.version}</version>
             <classifier>jdk8</classifier>
         </dependency>
         <dependency>
             <groupId>co.paralleluniverse</groupId>
             <artifactId>comsat-servlet</artifactId>
-            <version>0.5.0</version>
+            <version>${comsat.version}</version>
         </dependency>
         <dependency>
+            <groupId>co.paralleluniverse</groupId>
+            <artifactId>comsat-test-utils</artifactId>
+            <version>${comsat.version}</version>
+        </dependency>
+        <!--dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.3.0.v20150612</version>
+            <version>${jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>9.3.0.v20150612</version>
-        </dependency>
-        <dependency>
+            <version>${jetty.version}</version>
+        </dependency-->
+
+        <!--dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-util-ajax</artifactId>
-            <version>9.3.0.v20150612</version>
-        </dependency>
+            <version>${jetty.version}</version>
+        </dependency-->
     </dependencies>
 
     <build>
@@ -53,5 +67,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
