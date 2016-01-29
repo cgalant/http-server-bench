@@ -14,8 +14,8 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 
-public final class NettyActorServer {
-	private static final Actor actor = new HelloWebActor();
+public final class NettyActorServerSingle {
+	private static final Actor actor = new HelloWebActorSingle();
 	@SuppressWarnings("unchecked")
 	private static final ActorRef<? extends WebMessage> actorRef= actor.spawn();
 
@@ -40,7 +40,7 @@ public final class NettyActorServer {
 
     final ServerBootstrap b = new ServerBootstrap();
 
-    public NettyActorServer() {
+    public NettyActorServerSingle() {
 						b.option(ChannelOption.SO_BACKLOG, 65535);
         b.childOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, 0);
         b.childOption(ChannelOption.TCP_NODELAY, true);

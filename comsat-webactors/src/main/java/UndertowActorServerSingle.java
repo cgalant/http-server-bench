@@ -6,15 +6,20 @@ import co.paralleluniverse.comsat.webactors.undertow.WebActorHandler;
 import io.undertow.Undertow;
 import io.undertow.server.HttpServerExchange;
 
-public final class UndertowActorServer {
-	private static final Actor actor = new HelloWebActor();
+public final class UndertowActorServerSingle {
+	private static final Actor actor = new HelloWebActorSingle();
 	@SuppressWarnings("unchecked")
 	private static final ActorRef<? extends WebMessage> actorRef = actor.spawn();
 
-	public UndertowActorServer() {
+	public UndertowActorServerSingle() {
 			server = Undertow.builder()
-					.addHttpListener(9104, "localhost")
-					.setHandler(new WebActorHandler(new WebActorHandler.ContextProvider() {
+				.setDirectBuffers(true)
+				.setIoThreads(100)
+				.setWorkerThreads(100)
+				.setBufferSize(1024)
+				.setBuffersPerRegion(100)
+				.addHttpListener(9104, "localhost")
+				.setHandler(new WebActorHandler(new WebActorHandler.ContextProvider() {
 			@Override
 			public WebActorHandler.Context get(HttpServerExchange xch) {
 				return new WebActorHandler.DefaultContextImpl() {
