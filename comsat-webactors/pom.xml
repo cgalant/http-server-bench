@@ -9,7 +9,7 @@
 
     <properties>
         <quasar.version>0.7.4</quasar.version>
-        <comsat.version>0.5.1-SNAPSHOT</comsat.version>
+        <comsat.version>0.6.0-SNAPSHOT</comsat.version>
         <!--jetty.version>9.3.0.v20150612</jetty.version-->
         <!--jetty.version>9.2.14.v20151106</jetty.version-->
         <jetty.version>9.3.6.v20151106</jetty.version>
