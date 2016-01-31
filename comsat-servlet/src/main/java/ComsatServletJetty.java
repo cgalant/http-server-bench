@@ -13,7 +13,7 @@ public final class ComsatServletJetty {
             System.setProperty("delay", args[0]);
         final EmbeddedServer server = new JettyServer();
         server.setPort(9096);
-	server.addServlet("plaintext", PlaintextServlet.class, "/plaintext");
+        server.addServlet("plaintext", PlaintextServlet.class, "/hello");
         server.start();
     }
 }

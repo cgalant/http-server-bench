@@ -13,7 +13,7 @@ public final class ComsatServletUndertow {
             System.setProperty("delay", args[0]);
         final EmbeddedServer server = new UndertowServer();
         server.setPort(9099);
-	server.addServlet("plaintext", PlaintextServlet.class, "/plaintext");
+        server.addServlet("plaintext", PlaintextServlet.class, "/hello");
         server.start();
     }
 }

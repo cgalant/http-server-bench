@@ -13,7 +13,7 @@ public final class ComsatServletTomcat {
             System.setProperty("delay", args[0]);
         final EmbeddedServer server = new TomcatServer("comsat-servlet/target");
         server.setPort(9100);
-	server.addServlet("plaintext", PlaintextServlet.class, "/plaintext");
+        server.addServlet("plaintext", PlaintextServlet.class, "/hello");
         server.start();
     }
 }
