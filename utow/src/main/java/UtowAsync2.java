@@ -25,7 +25,7 @@ public final class UtowAsync2 implements HttpHandler {
     int num = 0;
     HttpServerExchange [] ac1=new HttpServerExchange[100000], ac2=new HttpServerExchange[100000],
             acv=ac1, copy=ac2;
-    byte [] bytes = "hello world".getBytes();
+    byte [] bytes = "Hello, world!".getBytes();
     ByteBuffer buf = ByteBuffer.allocate(bytes.length).put(bytes);
     { buf.flip(); }
     LinkedBlockingQueue<HttpServerExchange []> q = new LinkedBlockingQueue<>();
@@ -57,6 +57,7 @@ public final class UtowAsync2 implements HttpHandler {
 
     void reply(HttpServerExchange exchange) {
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
+        exchange.getResponseHeaders().put(Headers.SERVER, "undertow-async2");
         exchange.getResponseSender().send(buf.duplicate());
     }
     void reply(HttpServerExchange [] wrap) {

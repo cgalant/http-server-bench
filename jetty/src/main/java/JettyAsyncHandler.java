@@ -27,8 +27,9 @@ public class JettyAsyncHandler extends AbstractHandler {
     int num = 0;
     AsyncContext [] ac1=new AsyncContext[100000], ac2=new AsyncContext[100000],
             acv=ac1, copy=ac2;
-    ByteBuffer helloWorld = BufferUtil.toBuffer("hello world");
-    HttpField contentType = new PreEncodedHttpField(HttpHeader.CONTENT_TYPE,MimeTypes.Type.TEXT_PLAIN.asString());
+    ByteBuffer helloWorld = BufferUtil.toBuffer("Hello, world!");
+    HttpField contentType = new PreEncodedHttpField(HttpHeader.CONTENT_TYPE, MimeTypes.Type.TEXT_PLAIN.asString());
+    HttpField server = new PreEncodedHttpField(HttpHeader.SERVER, "jetty-async-handler");
     LinkedBlockingQueue<AsyncContext []> q = new LinkedBlockingQueue<>();
 
     synchronized int swap() {
@@ -51,9 +52,6 @@ public class JettyAsyncHandler extends AbstractHandler {
         acv[num++] = async;
     }
 
-    
-    
-    
     public void handle(String target,Request br,HttpServletRequest request,HttpServletResponse response) {
         final AsyncContext async = request.startAsync();
         async.setTimeout(30000);
@@ -95,7 +93,7 @@ public class JettyAsyncHandler extends AbstractHandler {
     { timers(); }
     
     public static void main(String[] args) throws Exception {
-        Server server = new Server(9092);
+        Server server = new Server(9091);
         server.setHandler(new JettyAsyncHandler());
         server.start();
     }

@@ -42,12 +42,13 @@ public final class UtowAsync implements HttpHandler {
         else acv[num++] = async;
     }
 
-    byte [] bytes = "hello world".getBytes();
+    byte [] bytes = "Hello, world!".getBytes();
     ByteBuffer buf = ByteBuffer.allocate(bytes.length).put(bytes);
     { buf.flip(); }
     
     void reply(HttpServerExchange exchange) {
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
+        exchange.getResponseHeaders().put(Headers.SERVER, "undertow-async");
         exchange.getResponseSender().send(buf.duplicate());
     }
     

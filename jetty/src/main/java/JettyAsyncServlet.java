@@ -1,6 +1,7 @@
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.servlet.AsyncContext;
@@ -18,6 +19,8 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 public class JettyAsyncServlet extends HttpServlet
 {
+    private static final byte[] HELLO_WORLD = "Hello, World!".getBytes(StandardCharsets.ISO_8859_1);
+
     final static String RESULTS_ATTR = "org.eclipse.jetty.demo.client";
     final boolean useasync;
 
@@ -28,8 +31,6 @@ public class JettyAsyncServlet extends HttpServlet
         useasync = async;
     }
 
-    
-    
     synchronized void store(AsyncContext async) {
         if (async==null)
             while (num > 0) {
@@ -48,14 +49,13 @@ public class JettyAsyncServlet extends HttpServlet
         {
             request.setAttribute(RESULTS_ATTR, new Object());
             final AsyncContext async = request.startAsync();
-            async.setTimeout(30000);
+            async.setTimeout(120000);
             store(async);
             return;
         }
-        response.setContentType("text/html");
-        PrintWriter out = response.getWriter();
-        out.println("hello world");
-        out.close();
+        response.setContentType("text/plain");
+        response.setHeader("Server", "jetty-servlet-async");
+        response.getOutputStream().write(HELLO_WORLD);
     }
     
 
