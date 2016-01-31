@@ -75,8 +75,8 @@ judo.sh comsat-servlet/target    $QUASAR ComsatServletTomcat            & # 9100
 judo.sh comsat-webactors/target  $QUASAR ComsatWebActorsServletJetty    & # 9101
 judo.sh comsat-webactors/target  $QUASAR ComsatWebActorsServletUndertow & # 9102
 judo.sh comsat-webactors/target  $QUASAR ComsatWebActorsServletTomcat   & # 9103
-judo.sh comsat-servlet/target    $QUASAR ComsatWebActorsUndertow        & # 9104
-judo.sh comsat-servlet/target    $QUASAR ComsatWebActorsNetty           & # 9105
+judo.sh comsat-servlet/target    $QUASAR ComsatWebActorsUndertowSingle  & # 9104
+judo.sh comsat-servlet/target    $QUASAR ComsatWebActorsNettySingle     & # 9105
 ```
 
 
