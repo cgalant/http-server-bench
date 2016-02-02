@@ -66,6 +66,7 @@ judo.sh  jetty/target            JettyHandler                           & # 9090
 judo.sh  jetty/target            JettyAsyncHandler                      & # 9091
 judo.sh  jetty/target            JettyAsyncServlet                      & # 9092
 judo.sh  kilim/target            KilimHello                             & # 9093
+judo.sh   utow/target            UtowSimple                             & # 9094
 judo.sh   utow/target            UtowTechem                             & # 9095
 judo.sh comsat-servlet/target    $QUASAR ComsatServletJetty             & # 9096
 judo.sh   utow/target            UtowAsync                              & # 9097
