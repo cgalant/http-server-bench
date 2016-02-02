@@ -1,10 +1,13 @@
 import co.paralleluniverse.actors.Actor;
 import co.paralleluniverse.actors.ActorRef;
+import co.paralleluniverse.common.test.TestUtil;
 import co.paralleluniverse.comsat.webactors.WebMessage;
 import co.paralleluniverse.comsat.webactors.undertow.WebActorHandler;
 import co.paralleluniverse.embedded.containers.AbstractEmbeddedServer;
 import io.undertow.Undertow;
+import io.undertow.UndertowOptions;
 import io.undertow.server.HttpServerExchange;
+import org.xnio.Options;
 
 public final class UndertowActorServerSingle {
     private static final Actor actor = new HelloWebActorOne();
@@ -13,12 +16,33 @@ public final class UndertowActorServerSingle {
 
     public UndertowActorServerSingle() {
         server = Undertow.builder()
+            .addHttpListener(9104, "localhost")
+
             .setDirectBuffers(true)
+
             .setIoThreads(100)
             .setWorkerThreads(100)
+
             .setBufferSize(1024)
             .setBuffersPerRegion(100)
-            .addHttpListener(9104, "localhost")
+
+            // .setSocketOption(Options.ALLOW_BLOCKING, true)
+            .setSocketOption(Options.REUSE_ADDRESSES, true)
+            // .setSocketOption(Options.CORK, true)
+            // .setSocketOption(Options.USE_DIRECT_BUFFERS, true)
+            // .setSocketOption(Options.BACKLOG, Integer.MAX_VALUE)
+            // .setSocketOption(Options.RECEIVE_BUFFER, 2048)
+            // .setSocketOption(Options.SEND_BUFFER, 2048)
+            // .setSocketOption(Options.CONNECTION_HIGH_WATER, Integer.MAX_VALUE)
+            // .setSocketOption(Options.CONNECTION_LOW_WATER, Integer.MAX_VALUE)
+            // .setSocketOption(Options.READ_TIMEOUT, Integer.MAX_VALUE)
+            // .setSocketOption(Options.WRITE_TIMEOUT, Integer.MAX_VALUE)
+            // .setServerOption(UndertowOptions.ALWAYS_SET_KEEP_ALIVE, false) //don't send a keep-alive header for HTTP/1.1 requests, as it is not required
+
+            // .setServerOption(UndertowOptions.ALWAYS_SET_DATE, true)
+            .setServerOption(UndertowOptions.ENABLE_CONNECTOR_STATISTICS, false)
+            .setServerOption(UndertowOptions.RECORD_REQUEST_START_TIME, false)
+
             .setHandler(new WebActorHandler(new MyContextProvider())).build();
     }
 
