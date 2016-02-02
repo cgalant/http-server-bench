@@ -1,4 +1,3 @@
-
 import co.paralleluniverse.fibers.Fiber;
 import co.paralleluniverse.fibers.SuspendExecution;
 import co.paralleluniverse.fibers.Suspendable;
@@ -21,13 +20,15 @@ public final class PlaintextServlet extends FiberHttpServlet {
         if (DELAY > 0) {
             try {
                 Fiber.sleep(DELAY);
-            } catch (final InterruptedException | SuspendExecution ex) {
-                ex.printStackTrace(System.err);
-                throw new RuntimeException(ex);
+            } catch (final InterruptedException ie) {
+                ie.printStackTrace(System.err);
+                throw new RuntimeException(ie);
+            } catch (final SuspendExecution se) {
+                throw new AssertionError(se);
             }
         }
         resp.setContentType("text/plain");
-            resp.setHeader("Server", "comsat-servlet");
+        resp.setHeader("Server", "comsat-servlet");
         resp.getOutputStream().write(HELLO_WORLD);
     }
 }

@@ -1,4 +1,3 @@
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,36 +29,32 @@ import java.nio.ByteBuffer;
  */
 public final class JettyHandler 
 {
-    public static void main(String[] args) throws Exception
-    {
-        Server server = new Server(9090);
-        ServerConnector connector = server.getBean(ServerConnector.class);
-        HttpConfiguration config = connector.getBean(HttpConnectionFactory.class).getHttpConfiguration();
+    public static void main(String[] args) throws Exception {
+        final Server server = new Server(9090);
+        final ServerConnector connector = server.getBean(ServerConnector.class);
+        final HttpConfiguration config = connector.getBean(HttpConnectionFactory.class).getHttpConfiguration();
         config.setSendDateHeader(true);
         config.setSendServerVersion(true);
 
-        PathHandler pathHandler = new PathHandler();
+        final PathHandler pathHandler = new PathHandler();
         server.setHandler(pathHandler);
 
         server.start();
         server.join();
     }
-    
-    public static class PathHandler extends AbstractHandler
-    {
-        ByteBuffer helloWorld = BufferUtil.toBuffer("Hello, world!");
-        HttpField contentType = new PreEncodedHttpField(HttpHeader.CONTENT_TYPE, MimeTypes.Type.TEXT_PLAIN.asString());
-        HttpField server = new PreEncodedHttpField(HttpHeader.SERVER, "jetty-handler");
+
+    public static class PathHandler extends AbstractHandler {
+        private static final ByteBuffer helloWorld = BufferUtil.toBuffer("Hello, world!");
+        private static final HttpField contentType = new PreEncodedHttpField(HttpHeader.CONTENT_TYPE, MimeTypes.Type.TEXT_PLAIN.asString());
+        private static final HttpField server = new PreEncodedHttpField(HttpHeader.SERVER, "jetty-handler");
 
         @Override
-        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
-        {
+        public final void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
             baseRequest.setHandled(true);
             baseRequest.getResponse().getHttpFields().add(contentType);
             baseRequest.getResponse().getHttpFields().add(server);
             if ("/hello".equals(target))
                 baseRequest.getResponse().getHttpOutput().sendContent(helloWorld.slice());
         }
-        
     }
 }

@@ -64,7 +64,7 @@ public final class UtowTechem {
 
 final class PlaintextHandler implements HttpHandler {
   private static final ByteBuffer buffer;
-  private static final String MESSAGE = "hello world";
+  private static final String MESSAGE = "Hello, world!";
 
   static {
       buffer = ByteBuffer.allocateDirect(MESSAGE.length());   
