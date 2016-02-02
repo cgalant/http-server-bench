@@ -7,7 +7,7 @@ import io.undertow.Undertow;
 import io.undertow.server.HttpServerExchange;
 
 public final class UndertowActorServerSingle {
-    private static final Actor actor = new HelloWebActorSingle();
+    private static final Actor actor = new HelloWebActorOne();
     @SuppressWarnings("unchecked")
     private static final ActorRef<? extends WebMessage> actorRef = actor.spawn();
 

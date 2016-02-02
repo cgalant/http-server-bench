@@ -15,9 +15,9 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 
 public final class NettyActorServerSingle {
-	private static final Actor actor = new HelloWebActorSingle();
-	@SuppressWarnings("unchecked")
-	private static final ActorRef<? extends WebMessage> actorRef= actor.spawn();
+    private static final Actor actor = new HelloWebActorOne();
+    @SuppressWarnings("unchecked")
+    private static final ActorRef<? extends WebMessage> actorRef = actor.spawn();
 
 	private static final WebActorHandler.DefaultContextImpl context = new WebActorHandler.DefaultContextImpl() {
 		@SuppressWarnings("unchecked")
@@ -41,7 +41,7 @@ public final class NettyActorServerSingle {
     final ServerBootstrap b = new ServerBootstrap();
 
     public NettyActorServerSingle() {
-						b.option(ChannelOption.SO_BACKLOG, 65535);
+        b.option(ChannelOption.SO_BACKLOG, 65535);
         b.childOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, 0);
         b.childOption(ChannelOption.TCP_NODELAY, true);
         b.childOption(ChannelOption.SO_REUSEADDR, true);

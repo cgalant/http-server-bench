@@ -6,6 +6,7 @@ public final class ComsatWebActorsServletTomcat {
     public static void main(String[] args) throws Exception {
         if (args.length > 0)
             System.setProperty("delay", args[0]);
+        HelloWebActor.SERVER_NAME = "comsat-webactors-servlet-tomcat";
         new ServletActorServer(new TomcatServer("comsat-webactors/target"), 9103).start();
     }
 }
