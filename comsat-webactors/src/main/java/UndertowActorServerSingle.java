@@ -1,5 +1,4 @@
 import co.paralleluniverse.actors.Actor;
-import co.paralleluniverse.actors.ActorImpl;
 import co.paralleluniverse.actors.ActorRef;
 import co.paralleluniverse.comsat.webactors.WebMessage;
 import co.paralleluniverse.comsat.webactors.undertow.WebActorHandler;
@@ -20,23 +19,7 @@ public final class UndertowActorServerSingle {
             .setBufferSize(1024)
             .setBuffersPerRegion(100)
             .addHttpListener(9104, "localhost")
-            .setHandler(new WebActorHandler(new WebActorHandler.ContextProvider() {
-                @Override
-                public WebActorHandler.Context get(HttpServerExchange xch) {
-                    return new WebActorHandler.DefaultContextImpl() {
-                        @SuppressWarnings("unchecked")
-                        @Override
-                        public ActorRef<? extends WebMessage> getRef() {
-                            return actorRef;
-                        }
-
-                        @Override
-                        public Class<? extends ActorImpl<? extends WebMessage>> getWebActorClass() {
-                            return (Class<? extends ActorImpl<? extends WebMessage>>) actor.getClass();
-                        }
-                    };
-                }
-            })).build();
+            .setHandler(new WebActorHandler(new MyContextProvider())).build();
     }
 
     public final void start() throws Exception {
@@ -46,4 +29,29 @@ public final class UndertowActorServerSingle {
     }
 
     private final Undertow server;
+
+    private static class MyContextProvider implements WebActorHandler.ContextProvider {
+        @Override
+        public final WebActorHandler.Context get(HttpServerExchange xch) {
+            return new MyDefaultContextImpl();
+        }
+
+        private static class MyDefaultContextImpl extends WebActorHandler.DefaultContextImpl {
+            @SuppressWarnings("unchecked")
+            @Override
+            public final ActorRef<? extends WebMessage> getRef() {
+                return actorRef;
+            }
+
+            @Override
+            public final boolean handlesWithWebSocket(String uri) {
+                return false;
+            }
+
+            @Override
+            public final boolean handlesWithHttp(String uri) {
+                return true;
+            }
+        }
+    }
 }

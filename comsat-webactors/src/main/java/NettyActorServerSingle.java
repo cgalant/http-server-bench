@@ -20,19 +20,7 @@ public final class NettyActorServerSingle {
     @SuppressWarnings("unchecked")
     private static final ActorRef<? extends WebMessage> actorRef = actor.spawn();
 
-	private static final WebActorHandler.DefaultContextImpl context = new WebActorHandler.DefaultContextImpl() {
-		@SuppressWarnings("unchecked")
-
-		@Override
-		public ActorRef<? extends WebMessage> getRef() {
-			return actorRef;
-		}
-
-		@Override
-		public Class<? extends ActorImpl<? extends WebMessage>> getWebActorClass() {
-			return (Class<? extends ActorImpl<? extends WebMessage>>) actor.getClass();
-		}
-	};
+    private static final WebActorHandler.DefaultContextImpl context = new MyDefaultContextImpl();
 
     public final void start() throws Exception {
         b.bind(9105).sync();
@@ -66,12 +54,32 @@ public final class NettyActorServerSingle {
             pipeline.addLast(new HttpRequestDecoder());
             pipeline.addLast(new HttpResponseEncoder());
             pipeline.addLast(new HttpObjectAggregator(65536));
-            pipeline.addLast(new WebActorHandler(new WebActorHandler.WebActorContextProvider() {
-							@Override
-							public WebActorHandler.Context get(ChannelHandlerContext ctx, FullHttpRequest req) {
-								return context;
-							}
-						}));
+            pipeline.addLast(new WebActorHandler(new MyWebActorContextProvider()));
+        }
+
+        private static class MyWebActorContextProvider implements WebActorHandler.WebActorContextProvider {
+            @Override
+            public WebActorHandler.Context get(ChannelHandlerContext ctx, FullHttpRequest req) {
+                return context;
+            }
+        }
+    }
+
+    private static class MyDefaultContextImpl extends WebActorHandler.DefaultContextImpl {
+        @SuppressWarnings("unchecked")
+        @Override
+        public ActorRef<? extends WebMessage> getRef() {
+            return actorRef;
+        }
+
+        @Override
+        public final boolean handlesWithWebSocket(String uri) {
+            return false;
+        }
+
+        @Override
+        public final boolean handlesWithHttp(String uri) {
+            return true;
         }
     }
 }
