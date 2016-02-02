@@ -3,6 +3,7 @@ import co.paralleluniverse.actors.ActorImpl;
 import co.paralleluniverse.actors.ActorRef;
 import co.paralleluniverse.comsat.webactors.WebMessage;
 import co.paralleluniverse.comsat.webactors.netty.WebActorHandler;
+import co.paralleluniverse.embedded.containers.AbstractEmbeddedServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
