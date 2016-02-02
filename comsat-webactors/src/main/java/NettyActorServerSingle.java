@@ -35,6 +35,7 @@ public final class NettyActorServerSingle {
 
     public final void start() throws Exception {
         b.bind(9105).sync();
+        AbstractEmbeddedServer.waitUrlAvailable("http://localhost:9105");
         System.err.println("Server is up.");
     }
 

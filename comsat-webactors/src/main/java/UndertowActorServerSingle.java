@@ -3,6 +3,7 @@ import co.paralleluniverse.actors.ActorImpl;
 import co.paralleluniverse.actors.ActorRef;
 import co.paralleluniverse.comsat.webactors.WebMessage;
 import co.paralleluniverse.comsat.webactors.undertow.WebActorHandler;
+import co.paralleluniverse.embedded.containers.AbstractEmbeddedServer;
 import io.undertow.Undertow;
 import io.undertow.server.HttpServerExchange;
 
@@ -40,6 +41,7 @@ public final class UndertowActorServerSingle {
 
     public final void start() throws Exception {
         server.start();
+        AbstractEmbeddedServer.waitUrlAvailable("http://localhost:9104");
         System.err.println("Server is up.");
     }
 
