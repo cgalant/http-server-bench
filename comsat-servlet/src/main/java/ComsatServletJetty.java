@@ -12,6 +12,8 @@ public final class ComsatServletJetty {
         if (args.length > 0)
             System.setProperty("delay", args[0]);
 
+        PlaintextServlet.SERVER_NAME = "comsat-servlet-jetty";
+
         final Server server = new Server(new QueuedThreadPool(100, 2));
         final ServerConnector http = new ServerConnector(server);
         http.setPort(9021);

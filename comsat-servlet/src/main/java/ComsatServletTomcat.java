@@ -12,6 +12,8 @@ public final class ComsatServletTomcat {
         if (args.length > 0)
             System.setProperty("delay", args[0]);
 
+        PlaintextServlet.SERVER_NAME = "comsat-servlet-tomcat";
+
         final Tomcat tomcat = new Tomcat();
         final Context context = tomcat.addContext("/", new File("comsat-servlet/target").getAbsolutePath());
 

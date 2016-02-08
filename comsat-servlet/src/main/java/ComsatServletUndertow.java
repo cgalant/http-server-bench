@@ -12,6 +12,8 @@ import org.xnio.Options;
 
 public final class ComsatServletUndertow {
     public static void main(String[] args) throws Exception {
+        PlaintextServlet.SERVER_NAME = "comsat-servlet-undertow";
+
         final DeploymentInfo deployment = Servlets.deployment().setDeploymentName("")
             .setClassLoader(ClassLoader.getSystemClassLoader())
             .setContextPath("/");
