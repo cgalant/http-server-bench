@@ -12,6 +12,8 @@ import java.nio.charset.StandardCharsets;
 public final class PlaintextServlet extends FiberHttpServlet {
     private static final byte[] HELLO_WORLD = "Hello, World!".getBytes(StandardCharsets.ISO_8859_1);
 
+    static String SERVER_NAME = "";
+
     private final long DELAY = Long.parseLong(System.getProperty("delay", "0"));
 
     @Override
@@ -28,6 +30,7 @@ public final class PlaintextServlet extends FiberHttpServlet {
             }
         }
         resp.setContentType("text/plain");
+        resp.setHeader("Server", SERVER_NAME);
         resp.getOutputStream().write(HELLO_WORLD);
     }
 }
