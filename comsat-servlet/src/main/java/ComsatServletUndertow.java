@@ -12,6 +12,9 @@ import org.xnio.Options;
 
 public final class ComsatServletUndertow {
     public static void main(String[] args) throws Exception {
+        if (args.length > 0)
+            System.setProperty("delay", args[0]);
+
         PlaintextServlet.SERVER_NAME = "comsat-servlet-undertow";
 
         final DeploymentInfo deployment = Servlets.deployment().setDeploymentName("")
