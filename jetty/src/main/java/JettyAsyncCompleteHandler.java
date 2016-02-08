@@ -2,10 +2,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javax.servlet.AsyncContext;
 
-
-// 9091 async
-// 9092 not async
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -22,18 +18,22 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.util.BufferUtil;
 
-public class JettyAsyncHandler extends AbstractHandler {
-    private static final ByteBuffer helloWorld = BufferUtil.toBuffer("Hello, world!");
+// 9010
+
+public final class JettyAsyncCompleteHandler extends AbstractHandler {
+    private static final ByteBuffer helloWorld = BufferUtil.toBuffer("Hello, World!");
     private static final HttpField contentType = new PreEncodedHttpField(HttpHeader.CONTENT_TYPE, MimeTypes.Type.TEXT_PLAIN.asString());
-    private static final HttpField server = new PreEncodedHttpField(HttpHeader.SERVER, "jetty-async-handler");
+    private static final HttpField server = new PreEncodedHttpField(HttpHeader.SERVER, "jetty-async-complete-handler");
     private static final LinkedBlockingQueue<AsyncContext[]> q = new LinkedBlockingQueue<>();
 
+    private static final AsyncContext[] ac1 = new AsyncContext[100000], ac2 = new AsyncContext[100000];
+
+    private static AsyncContext[] acv = ac1, copy = ac2;
+
     private static int num = 0;
-    private static AsyncContext[] ac1 = new AsyncContext[100000], ac2 = new AsyncContext[100000],
-        acv = ac1, copy = ac2;
 
     final synchronized int swap() {
-        int n2 = num;
+        final int n2 = num;
         copy = acv;
         acv = (acv == ac1) ? ac2 : ac1;
         num = 0;
@@ -42,7 +42,7 @@ public class JettyAsyncHandler extends AbstractHandler {
 
     final AsyncContext[] wrap() {
         final int n2 = swap();
-        AsyncContext a2[] = new AsyncContext[n2];
+        final AsyncContext a2[] = new AsyncContext[n2];
         System.arraycopy(copy, 0, a2, 0, n2);
         Arrays.fill(copy, 0, n2, null);
         return a2;
@@ -76,7 +76,7 @@ public class JettyAsyncHandler extends AbstractHandler {
     }
 
     final void reply() {
-        AsyncContext[] wrap = wrap();
+        final AsyncContext[] wrap = wrap();
         if (wrap.length == 0 || q.add(wrap)) return;
         reply(wrap);
     }
@@ -91,7 +91,7 @@ public class JettyAsyncHandler extends AbstractHandler {
     final void timers() {
         final int delta = 10, nt = 3;
         new Timer().schedule(new TimerTask() {
-            public void run() {
+            public final void run() {
                 reply();
             }
         }, delta, delta);
@@ -107,8 +107,8 @@ public class JettyAsyncHandler extends AbstractHandler {
     }
 
     public static void main(String[] args) throws Exception {
-        Server server = new Server(9091);
-        server.setHandler(new JettyAsyncHandler());
+        Server server = new Server(9011);
+        server.setHandler(new JettyAsyncCompleteHandler());
         server.start();
     }
 }

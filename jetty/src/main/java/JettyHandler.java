@@ -17,20 +17,12 @@ import org.eclipse.jetty.util.BufferUtil;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+// 8010
 
-// 9090
-// simplified by srl based on the techem
-// performance appears to be identical
-// 91k-ish req/s
-
-/**
- * An implementation of the TechEmpower benchmark tests using the Jetty web
- * server.  
- */
-public final class JettyHandler 
+public final class JettyHandler
 {
     public static void main(String[] args) throws Exception {
-        final Server server = new Server(9090);
+        final Server server = new Server(8010);
         final ServerConnector connector = server.getBean(ServerConnector.class);
         final HttpConfiguration config = connector.getBean(HttpConnectionFactory.class).getHttpConfiguration();
         config.setSendDateHeader(true);
@@ -44,7 +36,7 @@ public final class JettyHandler
     }
 
     public static class PathHandler extends AbstractHandler {
-        private static final ByteBuffer helloWorld = BufferUtil.toBuffer("Hello, world!");
+        private static final ByteBuffer helloWorld = BufferUtil.toBuffer("Hello, World!");
         private static final HttpField contentType = new PreEncodedHttpField(HttpHeader.CONTENT_TYPE, MimeTypes.Type.TEXT_PLAIN.asString());
         private static final HttpField server = new PreEncodedHttpField(HttpHeader.SERVER, "jetty-handler");
 

@@ -1,19 +1,32 @@
+import co.paralleluniverse.embedded.containers.AbstractEmbeddedServer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
-// mvn clean package dependency:copy-dependencies -DoutputDirectory=target
-// java -cp "target/*" -javaagent:target/quasar-core-0.7.4-jdk8.jar ComsatServletJetty
-
-import co.paralleluniverse.embedded.containers.EmbeddedServer;
-import co.paralleluniverse.embedded.containers.JettyServer;
-
-// 9096
+// 9021
 
 public final class ComsatServletJetty {
     public static void main(String[] args) throws Exception {
         if (args.length > 0)
             System.setProperty("delay", args[0]);
-        final EmbeddedServer server = new JettyServer();
-        server.setPort(9096);
-        server.addServlet("plaintext", PlaintextServlet.class, "/hello");
+
+        final Server server = new Server(new QueuedThreadPool(100, 2));
+        final ServerConnector http = new ServerConnector(server);
+        http.setPort(9021);
+        http.setAcceptQueueSize(100000);
+        server.addConnector(http);
+
+        final ServletContextHandler context = new ServletContextHandler();
+        context.setContextPath("/");
+
+        final ServletHolder holder = new ServletHolder(new PlaintextServlet());
+        context.addServlet(holder, "/hello");
+        holder.setAsyncSupported(true);
+
+        server.setHandler(context);
         server.start();
+        AbstractEmbeddedServer.waitUrlAvailable("http://localhost:9021/hello");
     }
 }

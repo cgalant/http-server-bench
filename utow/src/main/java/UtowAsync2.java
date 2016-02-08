@@ -1,10 +1,10 @@
-
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import io.undertow.util.SameThreadExecutor;
+
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -12,85 +12,96 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingQueue;
 
-// 9098
+// 9001
 
 public final class UtowAsync2 implements HttpHandler {
+    final HttpServerExchange[]
+        ac1 = new HttpServerExchange[100000], ac2 = new HttpServerExchange[100000];
+    final byte[] bytes = "Hello, World!".getBytes();
+    final ByteBuffer buf = ByteBuffer.allocate(bytes.length).put(bytes);
 
-// http://lists.jboss.org/pipermail/undertow-dev/2014-August/000898.html
-
-// at 3000 concurrency
-// sending while synchronized takes a bunch of reps to jit, but hits 80-84k req/s
-// fast-flip 90k req/s
+    HttpServerExchange[]acv = ac1, copy = ac2;
 
     int num = 0;
-    HttpServerExchange [] ac1=new HttpServerExchange[100000], ac2=new HttpServerExchange[100000],
-            acv=ac1, copy=ac2;
-    byte [] bytes = "Hello, world!".getBytes();
-    ByteBuffer buf = ByteBuffer.allocate(bytes.length).put(bytes);
-    { buf.flip(); }
-    LinkedBlockingQueue<HttpServerExchange []> q = new LinkedBlockingQueue<>();
 
-    synchronized int swap() {
-        int n2 = num;
+    {
+        buf.flip();
+    }
+
+    final LinkedBlockingQueue<HttpServerExchange[]> q = new LinkedBlockingQueue<>();
+
+    synchronized final int swap() {
+        final int n2 = num;
         copy = acv;
-        acv = (acv==ac1) ? ac2:ac1;
+        acv = (acv == ac1) ? ac2 : ac1;
         num = 0;
         return n2;
     }
 
-    HttpServerExchange [] wrap() {
-        int n2 = swap();
-        HttpServerExchange a2[]=new HttpServerExchange[n2];
-        System.arraycopy(copy,0,a2,0,n2);
-        Arrays.fill(copy,0,n2,null);
+    final HttpServerExchange[] wrap() {
+        final int n2 = swap();
+        final HttpServerExchange a2[] = new HttpServerExchange[n2];
+        System.arraycopy(copy, 0, a2, 0, n2);
+        Arrays.fill(copy, 0, n2, null);
         return a2;
     }
-    synchronized void store(HttpServerExchange async) {
+
+    synchronized final void store(HttpServerExchange async) {
         acv[num++] = async;
     }
 
-    
-    
-    public void handleRequest(final HttpServerExchange exchange) throws Exception {
+
+    public final void handleRequest(final HttpServerExchange exchange) throws Exception {
         exchange.dispatch(SameThreadExecutor.INSTANCE, () -> store(exchange));
     }
 
-    void reply(HttpServerExchange exchange) {
+    final void reply(HttpServerExchange exchange) {
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
         exchange.getResponseHeaders().put(Headers.SERVER, "undertow-async2");
         exchange.getResponseSender().send(buf.duplicate());
     }
-    void reply(HttpServerExchange [] wrap) {
-        for (int ii=0; ii<wrap.length; ii++)
+
+    final void reply(HttpServerExchange[] wrap) {
+        for (int ii = 0; ii < wrap.length; ii++)
             reply(wrap[ii]);
     }
-    void reply() {
-        HttpServerExchange [] wrap = wrap();
-        if (wrap.length==0 || q.add(wrap)) return;
+
+    final void reply() {
+        final HttpServerExchange[] wrap = wrap();
+        if (wrap.length == 0 || q.add(wrap)) return;
         reply(wrap);
     }
 
-    void poll() {
-        try { reply(q.take()); }
-        catch (Exception ex) {}
-    }
-    void timers() {
-        int delta = 10, nt = 3;
-        new Timer().schedule(new TimerTask() { public void run() {
-            reply();
-        } },delta,delta);
-        
-        for (int ii=0; ii<nt; ii++)
-            new Thread(()-> { while (true) poll(); }).start();
-    }
-    { timers(); }
-    
-    public static void main(String[] args) throws Exception {
-        Undertow.builder()
-                .addHttpListener(9098,"0.0.0.0")
-                .setHandler(Handlers.path().addPrefixPath("/hello",new UtowAsync2()))
-                .build()
-                .start();
+    final void poll() {
+        try {
+            reply(q.take());
+        } catch (final Exception ignored) {}
     }
 
+    final void timers() {
+        final int delta = 10, nt = 3;
+        new Timer().schedule(new TimerTask() {
+            public final void run() {
+                reply();
+            }
+        }, delta, delta);
+
+        for (int ii = 0; ii < nt; ii++) {
+            new Thread(() -> {
+                while (true) poll();
+            }).start();
+        }
+    }
+
+    {
+        timers();
+    }
+
+    public static void main(String[] args) throws Exception {
+        Undertow.builder()
+            .addHttpListener(9001, "0.0.0.0")
+            .setHandler(Handlers.path().addPrefixPath("/hello", new UtowAsync2()))
+            .build()
+            .start();
+    }
 }

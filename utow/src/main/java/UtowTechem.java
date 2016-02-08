@@ -1,4 +1,3 @@
-
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.UndertowOptions;
@@ -11,21 +10,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.sql.SQLException;
 
-// 9095
+// 8001
 
-/**
- * An implementation of the TechEmpower benchmark tests using the Undertow web
- * server.  The only test that truly exercises Undertow in isolation is the
- * plaintext test.  For the rest, it uses best-of-breed components that are
- * expected to perform well.  The idea is that using these components enables
- * these tests to serve as performance baselines for hypothetical, Undertow-based
- * frameworks.  For instance, it is unlikely that such frameworks would complete
- * the JSON test faster than this will, because this implementation uses
- * Undertow and Jackson in the most direct way possible to fulfill the test
- * requirements.
- */
 public final class UtowTechem {
-
 
   public static final String TEXT_PLAIN = "text/plain";
 
@@ -33,18 +20,9 @@ public final class UtowTechem {
     new UtowTechem();
   }
 
-  /**
-   * Creates and starts a new web server whose configuration is specified in the
-   * {@code server.properties} file.
-   *
-   * @throws IOException if the application properties file cannot be read or
-   *                     the Mongo database hostname cannot be resolved
-   * @throws SQLException if reading from the SQL database (while priming the
-   *                      cache) fails
-   */
   public UtowTechem() throws ClassNotFoundException, IOException, SQLException {
     Undertow.builder()
-        .addHttpListener(9095,"0.0.0.0")
+        .addHttpListener(8001,"0.0.0.0")
         .setBufferSize(1024 * 16)
         .setIoThreads(Runtime.getRuntime().availableProcessors() * 2) //this seems slightly faster in some configurations
         .setSocketOption(Options.BACKLOG, 10000)
@@ -52,9 +30,7 @@ public final class UtowTechem {
         .setServerOption(UndertowOptions.ALWAYS_SET_DATE, true)
         .setServerOption(UndertowOptions.ENABLE_CONNECTOR_STATISTICS, false)
         .setServerOption(UndertowOptions.RECORD_REQUEST_START_TIME, false)
-        .setHandler(Handlers.header(
-                Handlers.path().addPrefixPath("/hello", new PlaintextHandler()),
-                Headers.SERVER_STRING, "U-tow"))
+        .setHandler(Handlers.header(Handlers.path().addPrefixPath("/hello", new PlaintextHandler()), Headers.SERVER_STRING, "undertow-techem"))
         .setWorkerThreads(200)
         .build()
         .start();
@@ -64,7 +40,7 @@ public final class UtowTechem {
 
 final class PlaintextHandler implements HttpHandler {
   private static final ByteBuffer buffer;
-  private static final String MESSAGE = "Hello, world!";
+  private static final String MESSAGE = "Hello, World!";
 
   static {
       buffer = ByteBuffer.allocateDirect(MESSAGE.length());   

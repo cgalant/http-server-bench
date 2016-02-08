@@ -61,23 +61,37 @@ done
 QUASAR="-javaagent:$PWD/comsat-servlet/target/quasar-core-0.7.4-jdk8.jar"
 PATH=$PWD/tools:$PATH
 
+judo.sh   utow/target            UtowSimple                             & # 8000
+judo.sh   utow/target            UtowTechem                             & # 8001
+
+judo.sh   utow/target            UtowAsync                              & # 9000
+judo.sh   utow/target            UtowAsync2                             & # 9001
+
+
+judo.sh  jetty/target            JettyHandler                           & # 8010
+judo.sh  jetty/target            JettySyncServlet                       & # 8011
+
+judo.sh  jetty/target            JettyAsyncCompleteHandler              & # 9010
+judo.sh  jetty/target            JettyAsyncDispatchServlet              & # 9011
+judo.sh  jetty/target            JettyAsyncCompleteServlet              & # 9012
+
+
+judo.sh comsat-servlet/target    $QUASAR ComsatServletUndertow          & # 9020
+judo.sh comsat-servlet/target    $QUASAR ComsatServletJetty             & # 9021
+judo.sh comsat-servlet/target    $QUASAR ComsatServletTomcat            & # 9022
+
+
+judo.sh comsat-servlet/target    $QUASAR ComsatWebActorsNettySingle     & # 9030
+judo.sh comsat-servlet/target    $QUASAR ComsatWebActorsUndertowSingle  & # 9031
+judo.sh comsat-webactors/target  $QUASAR ComsatWebActorsServletJetty    & # 9032
+judo.sh comsat-webactors/target  $QUASAR ComsatWebActorsServletTomcat   & # 9033
+judo.sh comsat-webactors/target  $QUASAR ComsatWebActorsServletUndertow & # 9034
+
+
+judo.sh  kilim/target            KilimHello                             & # 9040
+
+
 judo.sh  spark/target            SparkHello                             & # 4567
-judo.sh  jetty/target            JettyHandler                           & # 9090
-judo.sh  jetty/target            JettyAsyncHandler                      & # 9091
-judo.sh  jetty/target            JettyAsyncServlet                      & # 9092
-judo.sh  kilim/target            KilimHello                             & # 9093
-judo.sh   utow/target            UtowSimple                             & # 9094
-judo.sh   utow/target            UtowTechem                             & # 9095
-judo.sh comsat-servlet/target    $QUASAR ComsatServletJetty             & # 9096
-judo.sh   utow/target            UtowAsync                              & # 9097
-judo.sh   utow/target            UtowAsync2                             & # 9098
-judo.sh comsat-servlet/target    $QUASAR ComsatServletUndertow          & # 9099
-judo.sh comsat-servlet/target    $QUASAR ComsatServletTomcat            & # 9100
-judo.sh comsat-webactors/target  $QUASAR ComsatWebActorsServletJetty    & # 9101
-judo.sh comsat-webactors/target  $QUASAR ComsatWebActorsServletUndertow & # 9102
-judo.sh comsat-webactors/target  $QUASAR ComsatWebActorsServletTomcat   & # 9103
-judo.sh comsat-servlet/target    $QUASAR ComsatWebActorsUndertowSingle  & # 9104
-judo.sh comsat-servlet/target    $QUASAR ComsatWebActorsNettySingle     & # 9105
 ```
 
 

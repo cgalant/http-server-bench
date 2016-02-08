@@ -28,7 +28,6 @@ public final class PlaintextServlet extends FiberHttpServlet {
             }
         }
         resp.setContentType("text/plain");
-        resp.setHeader("Server", "comsat-servlet");
         resp.getOutputStream().write(HELLO_WORLD);
     }
 }

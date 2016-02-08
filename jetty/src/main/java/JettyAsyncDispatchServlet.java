@@ -1,35 +1,28 @@
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+
+import javax.servlet.AsyncContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.servlet.AsyncContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
+// 9011
 
-// 9091
-// async by default, any cmd-line-arg for not async
-
-public class JettyServlet extends HttpServlet {
-    private static final byte[] HELLO_WORLD = "Hello, world!".getBytes(StandardCharsets.ISO_8859_1);
+public final class JettyAsyncDispatchServlet extends HttpServlet {
+    private static final byte[] HELLO_WORLD = "Hello, World!".getBytes(StandardCharsets.ISO_8859_1);
     private final static String RESULTS_ATTR = "org.eclipse.jetty.demo.client";
-
-    private static boolean useasync;
 
     private static int num = 0;
     private static final AsyncContext acv[] = new AsyncContext[1000000];
     private static Lock l = new ReentrantLock();
-
-    public JettyServlet(boolean async) {
-        useasync = async;
-    }
 
     static void store(AsyncContext async) {
         try {
@@ -55,7 +48,7 @@ public class JettyServlet extends HttpServlet {
     protected final void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         final Object results = request.getAttribute(RESULTS_ATTR);
 
-        if (useasync && results == null) {
+        if (results == null) {
             request.setAttribute(RESULTS_ATTR, new Object());
             final AsyncContext async = request.startAsync();
             async.setTimeout(120000);
@@ -63,7 +56,7 @@ public class JettyServlet extends HttpServlet {
             return;
         }
         response.setContentType("text/plain");
-        response.setHeader("Server", useasync ? "jetty-servlet-async" : "jetty-servlet");
+        response.setHeader("Server", "jetty-async-dispatch-servlet");
         response.getOutputStream().write(HELLO_WORLD);
     }
 
@@ -72,11 +65,11 @@ public class JettyServlet extends HttpServlet {
         doGet(request, response);
     }
 
-    static Server setup(int port, boolean async) throws Exception {
-        final JettyServlet rest = new JettyServlet(async);
+    static Server setup(int port) throws Exception {
+        final JettyAsyncDispatchServlet rest = new JettyAsyncDispatchServlet();
         final Timer timer = new Timer();
-        if (useasync) timer.schedule(new TimerTask() {
-            public void run() {
+        timer.schedule(new TimerTask() {
+            public final void run() {
                 store(null);
             }
         }, 10, 10);
@@ -86,14 +79,13 @@ public class JettyServlet extends HttpServlet {
         context.setContextPath("/");
         final ServletHolder holder = new ServletHolder(rest);
         context.addServlet(holder, "/hello");
-        holder.setAsyncSupported(useasync);
+        holder.setAsyncSupported(true);
         server.setHandler(context);
         server.start();
         return server;
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length == 0) setup(9091, true);
-        else setup(9091, false);
+        setup(9011);
     }
 }

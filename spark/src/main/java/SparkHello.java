@@ -1,9 +1,8 @@
 import static spark.Spark.*;
 
-// default port is 4567
-// mvn dependency:copy-dependencies -DoutputDirectory=OUTPUT_DIR
+// 4567
 
-public class SparkHello {
+public final class SparkHello {
     public static void main(String[] args) {
         get("/hello", (request, response) -> {
             return "hello world";
