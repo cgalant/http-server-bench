@@ -17,7 +17,7 @@ public final class ComsatServletTomcat {
         final Tomcat tomcat = new Tomcat();
         final Context context = tomcat.addContext("/", new File("comsat-servlet/target").getAbsolutePath());
 
-        Wrapper w = Tomcat.addServlet(context, "plaintext", PlaintextServlet.class.getName());
+        final Wrapper w = Tomcat.addServlet(context, "plaintext", PlaintextServlet.class.getName());
         w.addMapping("/hello");
 
         tomcat.setPort(9022);
@@ -25,6 +25,9 @@ public final class ComsatServletTomcat {
         tomcat.getConnector().setAttribute("acceptCount", 100000);
 
         tomcat.start();
+        new Thread(() -> {
+            tomcat.getServer().await();
+        }).start();
         AbstractEmbeddedServer.waitUrlAvailable("http://localhost:9022/hello");
     }
 }
