@@ -7,8 +7,6 @@ import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.ListenerInfo;
-import io.undertow.servlet.api.ServletSessionConfig;
-import io.undertow.servlet.core.InMemorySessionManagerFactory;
 import org.xnio.Options;
 
 // 9034
@@ -34,6 +32,7 @@ public final class ComsatWebActorsServletUndertow {
 
         final HttpHandler handler = servletsContainer.start();
 
+        //noinspection deprecation
         final Undertow server = Undertow.builder()
             .setHandler(handler)
             .setDirectBuffers(false) // With servlet-based actors there's a leak if using DIRECT
