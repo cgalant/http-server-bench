@@ -4,6 +4,7 @@
 /.idea
 */.idea
 */*.iml
+*.iml
 tomcat.8080/
 *.class
 *.jfr

@@ -1,0 +1,9 @@
+dependencies {
+  compile "co.paralleluniverse:comsat-servlet:$comsatVer"
+
+  compile "co.paralleluniverse:comsat-actors-api:$comsatVer"
+
+  compile "io.undertow:undertow-core:$undertowVer"
+
+  compile "org.eclipse.jetty:jetty-server:$jettyVer"
+}

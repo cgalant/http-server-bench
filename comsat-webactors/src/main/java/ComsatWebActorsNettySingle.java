@@ -10,11 +10,9 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 
 import co.paralleluniverse.actors.Actor;
-import co.paralleluniverse.actors.ActorImpl;
 import co.paralleluniverse.actors.ActorRef;
 import co.paralleluniverse.comsat.webactors.WebMessage;
 import co.paralleluniverse.comsat.webactors.netty.WebActorHandler;
-import co.paralleluniverse.embedded.containers.AbstractEmbeddedServer;
 import co.paralleluniverse.embedded.containers.AbstractEmbeddedServer;
 
 // 9030
@@ -25,42 +23,6 @@ public final class ComsatWebActorsNettySingle {
     private static final ActorRef<? extends WebMessage> actorRef = actor.spawn();
 
     private static final WebActorHandler.DefaultContextImpl context = new MyDefaultContextImpl();
-
-    public final void start() throws Exception {
-        b.bind(9030).sync();
-        AbstractEmbeddedServer.waitUrlAvailable("http://localhost:9030");
-        System.err.println("Server is up.");
-    }
-
-    final ServerBootstrap b = new ServerBootstrap();
-
-    public ComsatWebActorsNettySingle() {
-        b.option(ChannelOption.SO_BACKLOG, 65535);
-        b.childOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, 0);
-        b.childOption(ChannelOption.TCP_NODELAY, true);
-        b.childOption(ChannelOption.SO_REUSEADDR, true);
-        b.childOption(ChannelOption.SO_LINGER, 0);
-        // b.childOption(ChannelOption.WRITE_BUFFER_HIGH_WATER_MARK, 32 * 1024);
-        // b.childOption(ChannelOption.WRITE_BUFFER_LOW_WATER_MARK, 8 * 1024);
-        b.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
-
-        final ChannelInitializer<SocketChannel> childHandler = new SocketChannelChannelInitializer();
-        final NioEventLoopGroup group = new NioEventLoopGroup();
-        b.group(group)
-            .channel(NioServerSocketChannel.class)
-            .childHandler(childHandler);
-    }
-
-    private static class SocketChannelChannelInitializer extends ChannelInitializer<SocketChannel> {
-        @Override
-        public void initChannel(SocketChannel ch) throws Exception {
-            final ChannelPipeline pipeline = ch.pipeline();
-            pipeline.addLast(new HttpRequestDecoder());
-            pipeline.addLast(new HttpResponseEncoder());
-            pipeline.addLast(new HttpObjectAggregator(65536));
-            pipeline.addLast(new WebActorHandler(new MyWebActorContextProvider()));
-        }
-
         private static class MyWebActorContextProvider implements WebActorHandler.WebActorContextProvider {
             @Override
             public WebActorHandler.Context get(ChannelHandlerContext ctx, FullHttpRequest req) {
@@ -90,12 +52,5 @@ public final class ComsatWebActorsNettySingle {
         public final boolean watch() {
             return false;
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-        if (args.length > 0)
-            System.setProperty("delay", args[0]);
-        HelloWebActor.SERVER_NAME = "comsat-webactors-netty-single";
-        new ComsatWebActorsNettySingle().start();
     }
 }

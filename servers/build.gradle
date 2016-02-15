@@ -1,0 +1,16 @@
+dependencies {
+  compile "org.eclipse.jetty:jetty-server:$jettyVer"
+  compile "org.eclipse.jetty:jetty-servlet:$jettyVer"
+  compile "org.eclipse.jetty:jetty-webapp:$jettyVer"
+
+  compile "org.apache.tomcat.embed:tomcat-embed-core:$tomcatVer"
+
+  compile "io.undertow:undertow-core:$undertowVer"
+  compile "io.undertow:undertow-servlet:$undertowVer"
+
+  compile "io.netty:netty-all:$nettyVer"
+
+  compile "com.sparkjava:spark-core:$sparkVer"
+
+  compile project(":serverhandlers")
+}
