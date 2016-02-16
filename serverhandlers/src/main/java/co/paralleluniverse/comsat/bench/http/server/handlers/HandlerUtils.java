@@ -23,6 +23,8 @@ public final class HandlerUtils {
     public static final String CT = "text/plain";
     public static final HttpField CTJ = new PreEncodedHttpField(HttpHeader.CONTENT_TYPE, MimeTypes.Type.TEXT_PLAIN.asString());
 
+    public static final long ASYNC_TIMEOUT = 120000;
+
     public static String server = "<UNSET>";
     public static HttpField jettyServer = new PreEncodedHttpField(HttpHeader.SERVER, server);
 

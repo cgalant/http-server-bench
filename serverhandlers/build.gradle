@@ -6,4 +6,6 @@ dependencies {
   compile "io.undertow:undertow-core:$undertowVer"
 
   compile "org.eclipse.jetty:jetty-server:$jettyVer"
+
+  compile "com.sparkjava:spark-core:$sparkVer"
 }
