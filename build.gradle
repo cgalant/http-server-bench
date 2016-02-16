@@ -27,14 +27,14 @@ allprojects {
 
 //    ext.clojureVer      = '1.7.0'
 //
-//    ext.slf4jVer        = '1.7.13'
 //    ext.log4jVer        = '1.2.17'
-//    ext.jbenderVer      = '1.0.1-SNAPSHOT'
 //
+    ext.hdrVer          = '2.1.8'
+
+    ext.httpCoreVer     = '4.4.4'
+    ext.httpClientVer   = '4.5'
+    ext.jbenderVer      = '1.0.1-SNAPSHOT'
     ext.slf4jApiVer     = '1.7.13'
-//    ext.httpCoreVer     = '4.4.1'
-//    ext.httpClientVer   = '4.5'
-//    ext.hdrVer          = '2.1.7'
 
     ext.jettyVer        = '9.3.6.v20151106'
     ext.tomcatVer       = '8.0.30'
@@ -61,10 +61,10 @@ allprojects {
             force "org.eclipse.jetty:jetty-servlet:$jettyVer"
             force "org.eclipse.jetty:jetty-webapp:$jettyVer"
             force "org.slf4j:slf4j-api:$slf4jApiVer"
-//            force "org.apache.httpcomponents:httpcore:$httpCoreVer"
-//            force "org.apache.httpcomponents:httpclient:$httpClientVer"
-//            force "org.hdrhistogram:HdrHistogram:$hdrVer"
-//            force "co.paralleluniverse:quasar-core:$quasarVer"
+            force "org.apache.httpcomponents:httpcore:$httpCoreVer"
+            force "org.apache.httpcomponents:httpclient:$httpClientVer"
+            force "org.hdrhistogram:HdrHistogram:$hdrVer"
+            force "co.paralleluniverse:quasar-core:$quasarVer"
 //
 //            force "org.clojure:clojure:$clojureVer"
 //            force "co.paralleluniverse:pulsar:$quasarVer"

@@ -3,3 +3,6 @@ include 'serverhandlers'
 
 include 'loadclients'
 include 'loadtargets'
+
+include 'loadclients:fiber-okhttp'
+include 'loadclients:fiber-apache'
