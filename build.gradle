@@ -129,7 +129,7 @@ allprojects {
                 'Application-Name'    : project.name,
                 'Application-Version' : project.version,
                 'Application-Class'   : 'Main',
-                'JVM-Args'            : '-XX:+AggressiveOpts -XX:-UseGCOverheadLimit',
+                'JVM-Args'            : '-server -XX:+AggressiveOpts -XX:-UseGCOverheadLimit -XX:+DisableExplicitGC -Xms=1G -Xmx=1G', //  -XX:+UseParallelOldGC -XX:+UseConcMarkSweepGC -XX:+UseG1GC -XX:MaxGCPauseMillis=10 -XX:GCTimeRatio=999
                 'System-Properties'   : 'co.paralleluniverse.fibers.detectRunawayFibers=false', // 'co.paralleluniverse.fibers.verifyInstrumentation'
                 'Java-Agents'         : getDependencies(configurations.quasar).iterator().next(),
                 'Repositories'        : 'central https://oss.sonatype.org/content/repositories/snapshots'
