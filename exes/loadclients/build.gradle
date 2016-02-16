@@ -10,5 +10,7 @@ dependencies {
 
     compile "net.sf.jopt-simple:jopt-simple:4.9"
 
-    compile project(":")
+    compile project(":exes")
 }
+
+fatCapsule.enabled = false

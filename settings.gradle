@@ -1,8 +1,8 @@
 include 'servers'
 include 'serverhandlers'
 
-include 'loadclients'
 include 'loadtargets'
-
-include 'loadclients:fiber-okhttp'
-include 'loadclients:fiber-apache'
+include 'exes'
+include 'exes:loadclients'
+include 'exes:loadclients:fiber-okhttp'
+include 'exes:loadclients:fiber-apache'
