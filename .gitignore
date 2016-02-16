@@ -10,3 +10,4 @@ tomcat.8080/
 *.jfr
 /kilim/lib
 /build/
+.gradle/
