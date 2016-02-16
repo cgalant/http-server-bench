@@ -1,6 +1,6 @@
 /jempower.nb/nbproject/private/
 */target
-/jempower.nb/build/
+/**/build/
 /.idea
 */.idea
 */*.iml
@@ -9,3 +9,4 @@ tomcat.8080/
 *.class
 *.jfr
 /kilim/lib
+/build/
