@@ -17,13 +17,13 @@ public final class Jetty {
     // s.join();
     // AbstractEmbeddedServer.waitUrlAvailable("...");
 
-    public static Server handlerServer(int port, int backlog, int maxIOP, AbstractHandler h) {
+    public static Server singleHandlerServer(int port, int backlog, int maxIOP, AbstractHandler h) {
         final Server s = server(port, backlog, maxIOP);
         s.setHandler(h);
         return s;
     }
 
-    public static Server servletServer(int port, int backlog, int maxIOP, HttpServlet hs, boolean async) throws Exception {
+    public static Server singleServletServer(int port, int backlog, int maxIOP, HttpServlet hs, boolean async) throws Exception {
         final Server s = server(port, backlog, maxIOP);
         final ServletContextHandler context = new ServletContextHandler();
         context.setContextPath(ServerUtils.CP);

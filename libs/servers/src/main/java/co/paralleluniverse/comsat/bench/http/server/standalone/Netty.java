@@ -10,11 +10,13 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 
+import java.util.concurrent.Callable;
+
 public final class Netty {
     // cf.sync();
     // AbstractEmbeddedServer.waitUrlAvailable("...");
 
-    public static ChannelFuture handlerServer(int port, int backlog, int maxIOP, SimpleChannelInboundHandler<Object> handler) {
+    public static ChannelFuture singleHandlerServer(int port, int backlog, int maxIOP, Callable<SimpleChannelInboundHandler<Object>> handlerProvider) {
         final ServerBootstrap b = new ServerBootstrap();
 
         b.option(ChannelOption.SO_BACKLOG, backlog);
@@ -26,28 +28,28 @@ public final class Netty {
         // b.childOption(ChannelOption.WRITE_BUFFER_LOW_WATER_MARK, 8 * 1024);
         b.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
 
-        final ChannelInitializer<SocketChannel> childHandler = new SocketChannelChannelInitializer(handler);
+        final ChannelInitializer<SocketChannel> childHandler = new SocketChannelChannelInitializer(handlerProvider);
         final NioEventLoopGroup group = new NioEventLoopGroup(maxIOP);
-        return b.group(group)
+        b.group(group)
             .channel(NioServerSocketChannel.class)
-            .childHandler(childHandler)
-            .bind(port);
+            .childHandler(childHandler);
+        return b.bind(port);
     }
 
-    private static class SocketChannelChannelInitializer extends ChannelInitializer<SocketChannel> {
-        private final SimpleChannelInboundHandler<Object> handler;
+    private static final class SocketChannelChannelInitializer extends ChannelInitializer<SocketChannel> {
+        private final Callable<SimpleChannelInboundHandler<Object>> handlerProvider;
 
-        public SocketChannelChannelInitializer(SimpleChannelInboundHandler<Object> handler) {
-            this.handler = handler;
+        public SocketChannelChannelInitializer(Callable<SimpleChannelInboundHandler<Object>> handlerProvider) {
+            this.handlerProvider = handlerProvider;
         }
 
         @Override
-        public void initChannel(SocketChannel ch) throws Exception {
+        public final void initChannel(SocketChannel ch) throws Exception {
             final ChannelPipeline pipeline = ch.pipeline();
             pipeline.addLast(new HttpRequestDecoder());
             pipeline.addLast(new HttpResponseEncoder());
             pipeline.addLast(new HttpObjectAggregator(65536));
-            pipeline.addLast(handler);
+            pipeline.addLast(handlerProvider.call());
         }
     }
 

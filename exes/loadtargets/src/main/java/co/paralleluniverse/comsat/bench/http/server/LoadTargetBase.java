@@ -44,16 +44,16 @@ public abstract class LoadTargetBase {
             "\n=============== SERVER SETTINGS ==============\n\n" +
 
               "- HANDLER\n" +
-                "\t* Per-request delay (-d): " + options.has(d) + "\n" +
-                "\t* Async request timeout (async only, -t): " + options.valueOf(t) + " ms\n" +
+                "\t* Per-request delay (millis, -d): " + options.valueOf(d) + "\n" +
+                "\t* Async request timeout (async only, -t): " + options.valueOf(t) + " ms\n\n" +
 
               "- SERVER\n" +
-                "\t* Port (-p): " + options.has(p) + "\n\n" +
+                "\t* Port (-p): " + options.valueOf(p) + "\n" +
                 "\t* Maximum queued incoming connections (-m): " + options.valueOf(m) + "\n" +
                 "\t* Maximum IO Parallelism (-i): " + options.valueOf(i) + "\n" +
                 "\t* Maximum Processing Parallelism (-w): " + options.valueOf(w) + "\n" +
 
-            "\n==============================================\n\n"
+            "\n==============================================\n"
         );
 
         HandlerUtils.delay = options.valueOf(d);

@@ -14,7 +14,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public final class ServletAsyncDispatch extends HttpServlet {
-    private static final byte[] TXT = HandlerUtils.CT.getBytes(HandlerUtils.TXT_CR);
+    private static final byte[] TXT = HandlerUtils.TXT.getBytes(HandlerUtils.TXT_CR);
 
     private final static String RESULTS_ATTR = "org.eclipse.jetty.demo.client";
 

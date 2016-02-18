@@ -21,15 +21,14 @@ import org.HdrHistogram.Histogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.util.Arrays.*;
-
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Arrays;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.pinterest.jbender.events.recording.Recorder.record;
+import static java.util.Arrays.asList;
 
 public abstract class ClientBase<Req, Res, Exec extends AutoCloseableRequestExecutor<Req, Res>, E extends Env<Req, Exec>> {
   private static final ExecutorService e = Executors.newCachedThreadPool();
@@ -61,7 +60,6 @@ public abstract class ClientBase<Req, Res, Exec extends AutoCloseableRequestExec
     parser.acceptsAll(asList(P, "preGenerateRequests"));
 
     final OptionSpec<String> u = parser.acceptsAll(asList("u", "url")).withRequiredArg().ofType(String.class).describedAs("URI").defaultsTo("http://localhost:9000");
-    final OptionSpec<String> z = parser.acceptsAll(asList("z", "monitorURL")).withRequiredArg().ofType(String.class).describedAs("Monitor control base URI").defaultsTo("http://localhost:9000/monitor");
 
     final OptionSpec<Long> x = parser.acceptsAll(asList("x", "hdrHistHighest")).withRequiredArg().ofType(Long.class).describedAs("HDR Histogram highest trackable value").defaultsTo(3_600_000L * 1_000_000_000L);
     final OptionSpec<Integer> d = parser.acceptsAll(asList("d", "hdrHistDigits")).withRequiredArg().ofType(Integer.class).describedAs("HDR Histogram number of significant value digits").defaultsTo(3);
@@ -106,7 +104,6 @@ public abstract class ClientBase<Req, Res, Exec extends AutoCloseableRequestExec
     System.err.println (
       "\n=============== JBENDER SETTINGS ==============\n" +
         "\t* URL (-u): GET " + options.valueOf(u) + "\n" +
-        "\t* Monitor control base URL (-z): " + options.valueOf(z) + "\n" +
         "\t" +
           (!options.has(v) ?
             (!options.has(r) ?
@@ -181,10 +178,6 @@ public abstract class ClientBase<Req, Res, Exec extends AutoCloseableRequestExec
         recorder = record(eventCh, hdrHistogramRecorder, resExecProgressLogger);
       }
 
-      // Reset and start server monitoring
-      simpleBlockingGET(options.valueOf(z) + "/reset");
-      simpleBlockingGET(options.valueOf(z) + "/start?sampleIntervalMS=" + options.valueOf(smsi) + "&printIntervalMS=" + options.valueOf(smpi) + "&sysMon=" + options.has(SMSY));
-
       // Main
       new Fiber<Void>("jbender", () -> {
         if (options.has(n)) {
@@ -203,9 +196,6 @@ public abstract class ClientBase<Req, Res, Exec extends AutoCloseableRequestExec
         }
       }).start().join();
 
-      // Stop server monitoring
-      simpleBlockingGET(options.valueOf(z) + "/stop");
-
       recorder.join();
 
       histogram.outputPercentileDistribution(System.err, options.valueOf(s));
@@ -214,19 +204,6 @@ public abstract class ClientBase<Req, Res, Exec extends AutoCloseableRequestExec
     } catch (final Throwable e) {
       LOG.error("Got exception: " + e.getMessage());
       LOG.error(Arrays.toString(e.getStackTrace()));
-    }
-  }
-
-  private static void simpleBlockingGET(String httpUrl) throws IOException {
-    HttpURLConnection _c = null;
-    try {
-      _c = (HttpURLConnection) new URL(httpUrl).openConnection();
-    } finally {
-      if (_c != null) {
-        _c.getInputStream().close();
-        _c.disconnect();
-      }
-      LOG.info("Performed GET " + httpUrl);
     }
   }
 

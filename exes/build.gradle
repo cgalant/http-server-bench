@@ -16,8 +16,6 @@ subprojects {
     dependencies {
         compile "org.slf4j:slf4j-api:$slf4jApiVer"
 
-        compile "ch.qos.logback:logback-classic:1.1.3"
-
         compile "net.sf.jopt-simple:jopt-simple:4.9"
 
         capsule "co.paralleluniverse:capsule:$capsuleVersion"
@@ -39,9 +37,9 @@ subprojects {
                 'Application-Name'    : project.name,
                 'Application-Version' : project.version,
                 'Application-Class'   : 'Main',
-                'JVM-Args'            : '-server -XX:+AggressiveOpts -XX:-UseGCOverheadLimit -XX:+DisableExplicitGC -XX:+HeapDumpOnOutOfMemoryError -Xms=1G -Xmx=1G', //  -XX:+UseParallelOldGC -XX:+UseConcMarkSweepGC -XX:+UseG1GC -XX:MaxGCPauseMillis=10 -XX:GCTimeRatio=999
+                'JVM-Args'            : '-server -XX:+AggressiveOpts -XX:-UseGCOverheadLimit -XX:+DisableExplicitGC -XX:+HeapDumpOnOutOfMemoryError -Xms1G -Xmx1G', //  -XX:+UseParallelOldGC -XX:+UseConcMarkSweepGC -XX:+UseG1GC -XX:MaxGCPauseMillis=10 -XX:GCTimeRatio=999
                 'System-Properties'   : 'co.paralleluniverse.fibers.detectRunawayFibers=false', // 'co.paralleluniverse.fibers.verifyInstrumentation'
-                'Java-Agents'         : getDependencies(configurations.quasar).iterator().next(),
+                'Java-Agents'         : ("quasar-core-$quasarVer" + (project.ext.classifier.isEmpty() ? "" : "-" + project.ext.classifier.substring(1)) + ".jar"),
                 'Repositories'        : 'central https://oss.sonatype.org/content/repositories/snapshots'
             )
         }

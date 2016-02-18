@@ -5,6 +5,8 @@ dependencies {
     compile "co.paralleluniverse:comsat-httpclient:$comsatVer"
 
     compile project(":exes")
+
+    compile "ch.qos.logback:logback-classic:1.1.3"
 }
 
 fatCapsule.enabled = false

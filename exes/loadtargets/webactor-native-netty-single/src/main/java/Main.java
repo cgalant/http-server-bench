@@ -18,7 +18,7 @@ public final class Main extends LoadTargetBase {
 
     @Override
     protected int getDefaultPort() {
-        return 8021;
+        return 8020;
     }
 
     @Override
@@ -38,8 +38,9 @@ public final class Main extends LoadTargetBase {
 
     @Override
     protected void start(int port, int backlog, int maxIOP, int maxProcessingP) throws Exception {
-        final ChannelFuture cf = Netty.handlerServer(port, backlog, maxIOP, new WebActorHandler(new MyWebActorContextProvider()));
         System.err.println("WARNING: Netty servers don't use the 'maxProcessingParallelism' parameter");
+        final MyWebActorContextProvider ctxP = new MyWebActorContextProvider();
+        final ChannelFuture cf = Netty.singleHandlerServer(port, backlog, maxIOP, () -> new WebActorHandler(ctxP));
         cf.sync();
         AbstractEmbeddedServer.waitUrlAvailable("http://localhost:" + port + HandlerUtils.URL);
         System.err.println("SERVER UP");

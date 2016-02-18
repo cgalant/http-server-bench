@@ -14,7 +14,7 @@ public class UndertowHandlerSyncTechem implements HttpHandler {
     static {
         buffer = ByteBuffer.allocateDirect(MESSAGE.length());
         try {
-            buffer.put(MESSAGE.getBytes(HandlerUtils.CT));
+            buffer.put(MESSAGE.getBytes(HandlerUtils.TXT_CR));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

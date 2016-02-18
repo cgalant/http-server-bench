@@ -16,17 +16,18 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
 public final class Undertow {
-    // u.start();
+    // new Thread(u::start).start();
     // AbstractEmbeddedServer.waitUrlAvailable("...");
 
-    public static io.undertow.Undertow handlerServer(int port, int backlog, int maxIOP, int maxWorkP, HttpHandler handler) {
-        final io.undertow.Undertow u = io.undertow.Undertow.builder()
+    public static io.undertow.Undertow singleHandlerServer(int port, int backlog, int maxIOP, int maxWorkP, HttpHandler handler) {
+        //noinspection deprecation
+        return io.undertow.Undertow.builder()
             .setHandler(handler)
-            .setDirectBuffers(true)
 
             .setIoThreads(maxIOP)
             .setWorkerThreads(maxWorkP)
 
+            .setDirectBuffers(true)
             .setBufferSize(1024)
             .setBuffersPerRegion(100)
 
@@ -49,35 +50,34 @@ public final class Undertow {
 
             .addHttpListener(port, "0.0.0.0")
             .build();
-
-        return u;
     }
 
-    public static io.undertow.Undertow servletServer(int port, int backlog, int maxIOP, int maxWorkP, Class<? extends HttpServlet> c, boolean async) throws ServletException {
+    public static io.undertow.Undertow singleServletServer(int port, int backlog, int maxIOP, int maxWorkP, Class<? extends HttpServlet> c, boolean async) throws ServletException {
         final DeploymentInfo deployment = getDeploymentInfo();
-        final DeploymentManager servletsContainer = addServletsContainer(deployment, c, async);
-        return handlerServer(port, backlog, maxIOP, maxWorkP, servletsContainer.start());
+        final HttpHandler h  = addSingleServletServletsContainer(deployment, c, async);
+        return singleHandlerServer(port, backlog, maxIOP, maxWorkP, h);
     }
 
     public static io.undertow.Undertow applicationEventListenerServer(int port, int backlog, int maxIOP, int maxWorkP, Class<? extends ServletContextListener> c) throws ServletException {
         final DeploymentInfo deployment = getDeploymentInfo();
         final DeploymentManager servletsContainer = addApplicationEventListenerContainer(deployment, c);
-        return handlerServer(port, backlog, maxIOP, maxWorkP, servletsContainer.start());
+        return singleHandlerServer(port, backlog, maxIOP, maxWorkP, servletsContainer.start());
     }
 
-    private static DeploymentManager addServletsContainer(DeploymentInfo deployment, Class<? extends HttpServlet> c, boolean async) {
-        final DeploymentManager servletsContainer = Servlets.defaultContainer().addDeployment(deployment);
-
+    private static HttpHandler addSingleServletServletsContainer(DeploymentInfo deployment, Class<? extends HttpServlet> c, boolean async) throws ServletException {
         final ServletInfo info = Servlets.servlet(ServerUtils.SN, c).addMapping(HandlerUtils.URL).setAsyncSupported(async);
         deployment.addServlet(info);
+        // The code below must follow the code above
+        final DeploymentManager servletsContainer = Servlets.defaultContainer().addDeployment(deployment);
         servletsContainer.deploy();
-        return servletsContainer;
+        return servletsContainer.start();
     }
 
     private static DeploymentManager addApplicationEventListenerContainer(DeploymentInfo deployment, Class<? extends ServletContextListener> c) {
-        final DeploymentManager servletsContainer = Servlets.defaultContainer().addDeployment(deployment.setDefaultSessionTimeout(1) /* Minimum */);
         final ListenerInfo li = Servlets.listener(c);
         deployment.addListener(li);
+        // The code below must follow the code above
+        final DeploymentManager servletsContainer = Servlets.defaultContainer().addDeployment(deployment.setDefaultSessionTimeout(1 /* Minimum = 1 second */));
         servletsContainer.deploy();
         return servletsContainer;
     }

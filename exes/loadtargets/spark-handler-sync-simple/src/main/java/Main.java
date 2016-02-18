@@ -32,7 +32,7 @@ public final class Main extends LoadTargetBase {
     @Override
     protected void start(int port, int backlog, int maxIOP, int maxProcessingP) throws Exception {
         Spark.startGet(port, maxIOP, new SparkHandlerSyncSimple());
-        System.err.println("WARNING: Netty servers don't use the 'maxIOParallelism' nor the 'maxProcessingParallelism' parameters");
+        System.err.println("WARNING: Spark servers don't use the 'maxIOParallelism' nor the 'maxProcessingParallelism' parameters");
         AbstractEmbeddedServer.waitUrlAvailable("http://localhost:" + port + HandlerUtils.URL);
         System.err.println("SERVER UP");
     }
