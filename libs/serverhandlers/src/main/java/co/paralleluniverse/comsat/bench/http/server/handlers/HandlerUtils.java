@@ -106,7 +106,7 @@ public final class HandlerUtils {
         completedRequests = new AtomicLong(0L);
 
     private static String fmt(Date d) {
-        return dateFormat.format(d);
+        return d != null ? dateFormat.format(d) : null;
     }
 
     private HandlerUtils() {}
