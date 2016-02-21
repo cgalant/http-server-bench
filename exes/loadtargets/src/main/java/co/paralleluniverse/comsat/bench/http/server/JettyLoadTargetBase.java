@@ -7,19 +7,19 @@ import org.eclipse.jetty.server.Server;
 public abstract class JettyLoadTargetBase extends LoadTargetBase {
     @Override
     protected final int getDefaultIOParallelism() {
-        return 100;
+        return -1; // Not used
     }
 
     @Override
     protected final int getDefaultWorkParallelism() {
-        return 100; // Used only for waits
+        return 10000;
     }
 
     @Override
     protected final void start(int port, int backlog, int maxIOP, int maxProcessingP) throws Exception {
-        System.err.println("WARNING: Jetty servers use the 'maxProcessingParallelism' parameter only for delayed responses");
+        System.err.println("WARNING: Jetty servers don't use the 'maxIOParallelism' parameter");
 
-        final Server s = getJettyServer(port, backlog, maxIOP);
+        final Server s = getJettyServer(port, backlog, maxProcessingP);
         s.start();
 
         AbstractEmbeddedServer.waitUrlAvailable("http://localhost:" + port + HandlerUtils.URL);

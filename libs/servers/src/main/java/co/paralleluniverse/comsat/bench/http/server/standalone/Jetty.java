@@ -17,22 +17,22 @@ public final class Jetty {
     // s.join();
     // AbstractEmbeddedServer.waitUrlAvailable("...");
 
-    public static Server singleHandlerServer(int port, int backlog, int maxIOP, AbstractHandler h) {
-        final Server s = server(port, backlog, maxIOP);
+    public static Server singleHandlerServer(int port, int backlog, int maxProcessingP, AbstractHandler h) {
+        final Server s = server(port, backlog, maxProcessingP);
         s.setHandler(h);
         return s;
     }
 
-    public static Server singleServletServer(int port, int backlog, int maxIOP, HttpServlet hs, boolean async) throws Exception {
-        final Server s = server(port, backlog, maxIOP);
+    public static Server singleServletServer(int port, int backlog, int maxProcessingP, HttpServlet hs, boolean async) throws Exception {
+        final Server s = server(port, backlog, maxProcessingP);
         final ServletContextHandler context = new ServletContextHandler();
         context.setContextPath(ServerUtils.CP);
         addServlet(hs, async, s);
         return s;
     }
 
-    public static Server applicationEventListenerServer(int port, int backlog, int maxIOP, Class<? extends ServletContextListener> c, boolean async) throws Exception {
-        final Server s = server(port, backlog, maxIOP);
+    public static Server applicationEventListenerServer(int port, int backlog, int maxProcessingP, Class<? extends ServletContextListener> c, boolean async) throws Exception {
+        final Server s = server(port, backlog, maxProcessingP);
         addApplicationEventListener(c, s);
         return s;
     }
@@ -53,8 +53,8 @@ public final class Jetty {
         s.setHandler(context);
     }
 
-    private static Server server(int port, int backlog, int maxIOP) {
-        final Server s = new Server(new QueuedThreadPool(maxIOP, Runtime.getRuntime().availableProcessors()));
+    private static Server server(int port, int backlog, int maxProcessingP) {
+        final Server s = new Server(new QueuedThreadPool(maxProcessingP, Runtime.getRuntime().availableProcessors()));
         final ServerConnector http = new ServerConnector(s);
         http.setAcceptQueueSize(backlog);
         http.setPort(port);
