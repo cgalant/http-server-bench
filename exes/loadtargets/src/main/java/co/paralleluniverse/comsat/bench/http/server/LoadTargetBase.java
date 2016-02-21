@@ -5,8 +5,6 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
-import java.io.IOException;
-
 import static java.util.Arrays.asList;
 
 public abstract class LoadTargetBase {
@@ -16,7 +14,7 @@ public abstract class LoadTargetBase {
 
     protected abstract int getDefaultWorkParallelism();
 
-    protected final int getDefaultConnectionsBacklog() {
+    protected int getDefaultConnectionsBacklog() {
         return 10000;
     }
 
