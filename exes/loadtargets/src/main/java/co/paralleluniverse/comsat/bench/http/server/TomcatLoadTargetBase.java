@@ -15,7 +15,7 @@ public abstract class TomcatLoadTargetBase extends LoadTargetBase {
 
     @Override
     protected final int getDefaultIOParallelism() {
-        return 200;
+        return 100;
     }
 
     @Override
