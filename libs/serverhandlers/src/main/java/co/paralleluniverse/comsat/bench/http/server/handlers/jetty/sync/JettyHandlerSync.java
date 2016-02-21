@@ -16,8 +16,8 @@ public final class JettyHandlerSync extends AbstractHandler {
 
     @Override
     public final void handle(String target, Request br, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        HandlerUtils.handleDelayWithThread();
         HandlerUtils.recordStart();
+        HandlerUtils.handleDelayWithThread();
 
         try {
             br.setHandled(true);
