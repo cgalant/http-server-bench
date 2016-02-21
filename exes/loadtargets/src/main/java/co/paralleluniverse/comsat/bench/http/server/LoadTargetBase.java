@@ -58,6 +58,7 @@ public abstract class LoadTargetBase {
 
         HandlerUtils.delay = options.valueOf(d);
         HandlerUtils.asyncTimeout = options.valueOf(t);
+        HandlerUtils.workers = options.valueOf(w);
 
         start(options.valueOf(p), options.valueOf(m), options.valueOf(i), options.valueOf(w));
     }

@@ -20,12 +20,12 @@ public abstract class TomcatLoadTargetBase extends LoadTargetBase {
 
     @Override
     protected final int getDefaultWorkParallelism() {
-        return -1; // Unused
+        return 100; // Used only for waits
     }
 
     @Override
     protected final void start(int port, int backlog, int maxIOP, int maxProcessingP) throws Exception {
-        System.err.println("WARNING: Tomcat servers don't use the 'maxProcessingParallelism' parameter");
+        System.err.println("WARNING: Tomcat servers use the 'maxProcessingParallelism' parameter only for delayed responses");
 
         final org.apache.catalina.startup.Tomcat t = getTomcatServer(port, backlog, maxIOP, new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParent());
 

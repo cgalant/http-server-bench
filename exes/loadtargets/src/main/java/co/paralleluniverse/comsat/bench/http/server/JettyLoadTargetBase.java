@@ -18,12 +18,12 @@ public abstract class JettyLoadTargetBase extends LoadTargetBase {
 
     @Override
     protected final int getDefaultWorkParallelism() {
-        return -1; // Unused
+        return 100; // Used only for waits
     }
 
     @Override
     protected final void start(int port, int backlog, int maxIOP, int maxProcessingP) throws Exception {
-        System.err.println("WARNING: Jetty servers don't use the 'maxProcessingParallelism' parameter");
+        System.err.println("WARNING: Jetty servers use the 'maxProcessingParallelism' parameter only for delayed responses");
 
         final Server s = getJettyServer(port, backlog, maxIOP);
         s.start();

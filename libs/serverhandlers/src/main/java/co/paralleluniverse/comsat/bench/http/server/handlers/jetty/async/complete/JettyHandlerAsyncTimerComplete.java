@@ -46,17 +46,20 @@ public final class JettyHandlerAsyncTimerComplete extends AbstractHandler {
     }
 
     final void reply(AsyncContext async) {
-        HandlerUtils.handleDelayWithThread();
-
-        try {
-            final Request br = (Request) async.getRequest();
-            br.setHandled(true);
-            br.getResponse().getHttpFields().add(HandlerUtils.CTJ);
-            br.getResponse().getHttpFields().add(HandlerUtils.jettyServer);
-            if (HandlerUtils.URL.equals(br.getPathInfo()))
-                br.getResponse().getHttpOutput().sendContent(TXT.slice());
-            async.complete();
-        } catch (final IOException ignored) {}
+        HandlerUtils.handleDelayWithTimer(() -> {
+            try {
+                final Request br = (Request) async.getRequest();
+                br.setHandled(true);
+                br.getResponse().getHttpFields().add(HandlerUtils.CTJ);
+                br.getResponse().getHttpFields().add(HandlerUtils.jettyServer);
+                if (HandlerUtils.URL.equals(br.getPathInfo()))
+                    br.getResponse().getHttpOutput().sendContent(TXT.slice());
+                async.complete();
+            } catch (final IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     final void reply(AsyncContext[] wrap) {

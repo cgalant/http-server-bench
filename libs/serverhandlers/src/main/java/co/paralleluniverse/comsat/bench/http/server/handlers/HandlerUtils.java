@@ -10,6 +10,9 @@ import org.eclipse.jetty.http.PreEncodedHttpField;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public final class HandlerUtils {
     public static final String HEAD_SERVER_KEY = "Server";
@@ -28,6 +31,10 @@ public final class HandlerUtils {
 
     public static long delay = 0;
     public static long asyncTimeout = 120000;
+
+    public static int workers = Runtime.getRuntime().availableProcessors();
+
+    public static ScheduledExecutorService timerPool = Executors.newScheduledThreadPool(workers);
 
     public static void handleDelayWithThread() {
         if (delay > 0) {
@@ -51,6 +58,14 @@ public final class HandlerUtils {
             } catch (final SuspendExecution se) {
                 throw new AssertionError(se);
             }
+        }
+    }
+
+    public static void handleDelayWithTimer(Runnable r) {
+        if (delay > 0) {
+            timerPool.schedule(r, delay, TimeUnit.MILLISECONDS);
+        } else {
+            r.run();
         }
     }
 

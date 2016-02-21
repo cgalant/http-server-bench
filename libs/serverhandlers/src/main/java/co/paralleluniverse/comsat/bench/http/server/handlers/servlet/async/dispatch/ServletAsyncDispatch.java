@@ -55,8 +55,6 @@ public final class ServletAsyncDispatch extends HttpServlet {
 
     @Override
     protected final void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HandlerUtils.handleDelayWithThread();
-
         final Object results = request.getAttribute(RESULTS_ATTR);
 
         if (results == null) {
@@ -66,8 +64,16 @@ public final class ServletAsyncDispatch extends HttpServlet {
             store(async);
             return;
         }
-        response.setContentType(HandlerUtils.CT);
-        response.setHeader(HandlerUtils.HEAD_SERVER_KEY, HandlerUtils.server);
-        response.getOutputStream().write(TXT);
+
+        HandlerUtils.handleDelayWithTimer(() -> {
+            response.setContentType(HandlerUtils.CT);
+            response.setHeader(HandlerUtils.HEAD_SERVER_KEY, HandlerUtils.server);
+            try {
+                response.getOutputStream().write(TXT);
+            } catch (final IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        });
     }
 }

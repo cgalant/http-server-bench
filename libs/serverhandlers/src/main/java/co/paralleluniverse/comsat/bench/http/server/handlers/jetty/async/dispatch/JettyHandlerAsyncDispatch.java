@@ -55,8 +55,6 @@ public class JettyHandlerAsyncDispatch extends AbstractHandler {
 
     @Override
     final public void handle(String target, Request br, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        HandlerUtils.handleDelayWithThread();
-
         final Object results = request.getAttribute(RESULTS_ATTR);
 
         if (results == null) {
@@ -67,10 +65,17 @@ public class JettyHandlerAsyncDispatch extends AbstractHandler {
             return;
         }
 
-        br.setHandled(true);
-        br.getResponse().getHttpFields().add(HandlerUtils.CTJ);
-        br.getResponse().getHttpFields().add(HandlerUtils.jettyServer);
-        if (HandlerUtils.URL.equals(br.getPathInfo()))
-            br.getResponse().getHttpOutput().sendContent(TXT.slice());
+        HandlerUtils.handleDelayWithTimer(() -> {
+            br.setHandled(true);
+            br.getResponse().getHttpFields().add(HandlerUtils.CTJ);
+            br.getResponse().getHttpFields().add(HandlerUtils.jettyServer);
+            if (HandlerUtils.URL.equals(br.getPathInfo()))
+                try {
+                    br.getResponse().getHttpOutput().sendContent(TXT.slice());
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+        });
     }
 }

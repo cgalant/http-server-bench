@@ -45,18 +45,18 @@ public final class ServletAsyncFJPComplete extends HttpServlet {
 
     private static void exec(AsyncContext ac) {
         pool.execute(() -> {
-            HandlerUtils.handleDelayWithThread();
-
-            final HttpServletResponse sr = (HttpServletResponse) ac.getResponse();
-            sr.setContentType(HandlerUtils.CT);
-            sr.setHeader(HandlerUtils.HEAD_SERVER_KEY, HandlerUtils.server);
-            try {
-                sr.getOutputStream().write(TXT);
-                ac.complete();
-            } catch (final IOException e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
+            HandlerUtils.handleDelayWithTimer(() -> {
+                final HttpServletResponse sr = (HttpServletResponse) ac.getResponse();
+                sr.setContentType(HandlerUtils.CT);
+                sr.setHeader(HandlerUtils.HEAD_SERVER_KEY, HandlerUtils.server);
+                try {
+                    sr.getOutputStream().write(TXT);
+                    ac.complete();
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+            });
         });
     }
 
