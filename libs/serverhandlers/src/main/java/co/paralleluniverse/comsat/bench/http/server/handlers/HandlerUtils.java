@@ -30,7 +30,7 @@ public final class HandlerUtils {
     public static HttpField jettyServer = new PreEncodedHttpField(HttpHeader.SERVER, server);
 
     public static long delay = 0L;
-    public static long asyncTimeout = 120000;
+    public static long asyncTimeout = 3_600_000_000L; // 1h
 
     public static int workers = Runtime.getRuntime().availableProcessors();
 
