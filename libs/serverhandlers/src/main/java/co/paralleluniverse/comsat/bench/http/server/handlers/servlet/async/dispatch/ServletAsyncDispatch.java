@@ -65,7 +65,8 @@ public final class ServletAsyncDispatch extends HttpServlet {
             return;
         }
 
-        HandlerUtils.handleDelayWithTimer(() -> {
+        HandlerUtils.handleDelayWithThread();
+        {
             response.setContentType(HandlerUtils.CT);
             response.setHeader(HandlerUtils.HEAD_SERVER_KEY, HandlerUtils.server);
             try {
@@ -74,6 +75,6 @@ public final class ServletAsyncDispatch extends HttpServlet {
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }
-        });
+        };
     }
 }
