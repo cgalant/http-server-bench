@@ -12,7 +12,7 @@ public abstract class UndertowLoadTargetBase extends LoadTargetBase {
 
     @Override
     protected final int getDefaultWorkParallelism() {
-        return 100;
+        return 10000;
     }
 
     @Override
