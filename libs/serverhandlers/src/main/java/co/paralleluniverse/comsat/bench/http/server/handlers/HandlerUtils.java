@@ -29,7 +29,7 @@ public final class HandlerUtils {
     public static String server = "<UNSET>";
     public static HttpField jettyServer = new PreEncodedHttpField(HttpHeader.SERVER, server);
 
-    public static long delay = 0;
+    public static long delay = 0L;
     public static long asyncTimeout = 120000;
 
     public static int workers = Runtime.getRuntime().availableProcessors();
