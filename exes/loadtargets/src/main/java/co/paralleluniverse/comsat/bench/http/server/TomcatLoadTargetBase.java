@@ -7,27 +7,21 @@ import org.apache.catalina.LifecycleException;
 import java.io.File;
 
 public abstract class TomcatLoadTargetBase extends LoadTargetBase {
-
-    @Override
-    protected final int getDefaultConnectionsBacklog() {
-        return 65535;
-    }
-
     @Override
     protected final int getDefaultIOParallelism() {
-        return 100;
+        return -1;
     }
 
     @Override
     protected final int getDefaultWorkParallelism() {
-        return 100; // Used only for waits
+        return 10000;
     }
 
     @Override
     protected final void start(int port, int backlog, int maxIOP, int maxProcessingP) throws Exception {
-        System.err.println("WARNING: Tomcat servers use the 'maxProcessingParallelism' parameter only for delayed responses");
+        System.err.println("WARNING: Tomcat servers don't use the 'maxIOParallelism' parameter");
 
-        final org.apache.catalina.startup.Tomcat t = getTomcatServer(port, backlog, maxIOP, new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParent());
+        final org.apache.catalina.startup.Tomcat t = getTomcatServer(port, backlog, maxProcessingP, new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParent());
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {

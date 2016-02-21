@@ -23,33 +23,36 @@ public final class Tomcat {
 
     // AbstractEmbeddedServer.waitUrlAvailable("...");
 
-    public static org.apache.catalina.startup.Tomcat singleServletServer(int port, int backlog, int maxIOP, String servletClassName, String contextRoot, boolean async) {
+    public static org.apache.catalina.startup.Tomcat singleServletServer(int port, int backlog, int maxProcessingP, String servletClassName, String contextRoot, boolean async) {
         final org.apache.catalina.startup.Tomcat t = getTomcat();
         final Context context = getContext(contextRoot, t);
 
         addServlet(context, servletClassName, async);
 
-        configure(port, backlog, maxIOP, t);
+        configure(port, backlog, maxProcessingP, t);
 
         return t;
     }
 
-    public static org.apache.catalina.startup.Tomcat applicationListenerServer(int port, int backlog, int maxIOP, Class<? extends ServletContextListener> c, String contextRoot) throws IllegalAccessException, InstantiationException {
+    public static org.apache.catalina.startup.Tomcat applicationListenerServer(int port, int backlog, int maxProcessingP, Class<? extends ServletContextListener> c, String contextRoot) throws IllegalAccessException, InstantiationException {
         final org.apache.catalina.startup.Tomcat t = getTomcat();
         final StandardContext context = (StandardContext) getContext(contextRoot, t);
 
         addApplicationListener(c, context);
         context.setSessionTimeout(1 /* Minimum = 1 minute */);
 
-        configure(port, backlog, maxIOP, t);
+        configure(port, backlog, maxProcessingP, t);
 
         return t;
     }
 
-    private static void configure(int port, int backlog, int maxIOP, org.apache.catalina.startup.Tomcat t) {
+    private static void configure(int port, int backlog, int maxProcessingP, org.apache.catalina.startup.Tomcat t) {
         t.setPort(port);
-        t.getConnector().setAttribute("maxThreads", maxIOP);
+        t.getConnector().setAttribute("maxThreads", maxProcessingP);
         t.getConnector().setAttribute("acceptCount", backlog);
+
+        t.getConnector().setAttribute("connectionLinger", 0);
+        t.getConnector().setAttribute("connectionTimeout", 3600000);
     }
 
     private static void addApplicationListener(Class<? extends ServletContextListener> c, StandardContext context) throws InstantiationException, IllegalAccessException {
