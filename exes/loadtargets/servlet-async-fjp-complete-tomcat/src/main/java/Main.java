@@ -8,6 +8,11 @@ public final class Main extends TomcatLoadTargetBase {
     }
 
     @Override
+    protected int getDefaultWorkParallelism() {
+        return 100;
+    }
+
+    @Override
     protected final int getDefaultPort() {
         return 8007;
     }

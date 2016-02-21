@@ -9,6 +9,11 @@ public final class Main extends JettyLoadTargetBase {
     }
 
     @Override
+    protected int getDefaultWorkParallelism() {
+        return 100;
+    }
+
+    @Override
     protected final int getDefaultPort() {
         return 8009;
     }

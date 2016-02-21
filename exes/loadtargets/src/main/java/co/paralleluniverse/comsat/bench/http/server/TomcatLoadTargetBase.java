@@ -13,7 +13,7 @@ public abstract class TomcatLoadTargetBase extends LoadTargetBase {
     }
 
     @Override
-    protected final int getDefaultWorkParallelism() {
+    protected int getDefaultWorkParallelism() {
         return 10000;
     }
 

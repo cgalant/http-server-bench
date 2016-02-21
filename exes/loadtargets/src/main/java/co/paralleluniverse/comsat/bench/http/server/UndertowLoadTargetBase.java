@@ -6,12 +6,12 @@ import org.eclipse.jetty.server.Server;
 
 public abstract class UndertowLoadTargetBase extends LoadTargetBase {
     @Override
-    protected final int getDefaultIOParallelism() {
+    protected int getDefaultIOParallelism() {
         return 10000;
     }
 
     @Override
-    protected final int getDefaultWorkParallelism() {
+    protected int getDefaultWorkParallelism() {
         return 10000;
     }
 

@@ -8,6 +8,16 @@ public final class Main extends UndertowLoadTargetBase {
     }
 
     @Override
+    protected int getDefaultIOParallelism() {
+        return 100;
+    }
+
+    @Override
+    protected int getDefaultWorkParallelism() {
+        return 100;
+    }
+
+    @Override
     protected final int getDefaultPort() {
         return 8011;
     }

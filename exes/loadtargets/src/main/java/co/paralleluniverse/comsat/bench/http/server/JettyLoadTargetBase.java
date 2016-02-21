@@ -11,7 +11,7 @@ public abstract class JettyLoadTargetBase extends LoadTargetBase {
     }
 
     @Override
-    protected final int getDefaultWorkParallelism() {
+    protected int getDefaultWorkParallelism() {
         return 10000;
     }
 
