@@ -37,7 +37,7 @@ subprojects {
                 'Application-Name'    : project.name,
                 'Application-Version' : project.version,
                 'Application-Class'   : 'Main',
-                'JVM-Args'            : '-server -XX:+AggressiveOpts -XX:-UseGCOverheadLimit -XX:+DisableExplicitGC -XX:+HeapDumpOnOutOfMemoryError -Xms1G -Xmx1G', //  -XX:+UseParallelOldGC -XX:+UseConcMarkSweepGC -XX:+UseG1GC -XX:MaxGCPauseMillis=10 -XX:GCTimeRatio=999
+                // 'JVM-Args'            : '-server -XX:+AggressiveOpts -XX:-UseGCOverheadLimit -XX:+DisableExplicitGC -XX:+HeapDumpOnOutOfMemoryError -Xms1G -Xmx1G', //  -XX:+UseParallelOldGC -XX:+UseConcMarkSweepGC -XX:+UseG1GC -XX:MaxGCPauseMillis=10 -XX:GCTimeRatio=999
                 'System-Properties'   : 'co.paralleluniverse.fibers.detectRunawayFibers=false', // 'co.paralleluniverse.fibers.verifyInstrumentation'
                 'Java-Agents'         : ("quasar-core-$quasarVer" + (project.ext.classifier.isEmpty() ? "" : "-" + project.ext.classifier.substring(1)) + ".jar"),
                 'Repositories'        : 'central https://oss.sonatype.org/content/repositories/snapshots'
