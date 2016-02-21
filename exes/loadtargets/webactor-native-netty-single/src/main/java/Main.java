@@ -22,11 +22,6 @@ public final class Main extends LoadTargetBase {
     }
 
     @Override
-    protected int getDefaultConnectionsBacklog() {
-        return 65535;
-    }
-
-    @Override
     protected int getDefaultIOParallelism() {
         return 100;
     }

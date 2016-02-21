@@ -12,11 +12,13 @@ import static java.util.Arrays.asList;
 public abstract class LoadTargetBase {
     protected abstract int getDefaultPort();
 
-    protected abstract int getDefaultConnectionsBacklog();
-
     protected abstract int getDefaultIOParallelism();
 
     protected abstract int getDefaultWorkParallelism();
+
+    protected final int getDefaultConnectionsBacklog() {
+        return 10000;
+    }
 
     protected abstract void start(int port, int backlog, int maxIOP, int maxProcessingP) throws Exception;
 

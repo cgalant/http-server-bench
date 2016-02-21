@@ -5,12 +5,6 @@ import co.paralleluniverse.embedded.containers.AbstractEmbeddedServer;
 import org.eclipse.jetty.server.Server;
 
 public abstract class JettyLoadTargetBase extends LoadTargetBase {
-
-    @Override
-    protected final int getDefaultConnectionsBacklog() {
-        return 65535;
-    }
-
     @Override
     protected final int getDefaultIOParallelism() {
         return 100;

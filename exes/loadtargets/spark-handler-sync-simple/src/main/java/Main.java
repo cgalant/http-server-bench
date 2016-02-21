@@ -15,11 +15,6 @@ public final class Main extends LoadTargetBase {
     }
 
     @Override
-    protected int getDefaultConnectionsBacklog() {
-        return -1; // Unused
-    }
-
-    @Override
     protected int getDefaultIOParallelism() {
         return 100;
     }
