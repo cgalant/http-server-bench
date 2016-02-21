@@ -49,10 +49,15 @@ public final class UtowHandlerAsyncSameThreadQueue implements HttpHandler {
     }
 
     final void reply(HttpServerExchange exchange) {
+        HandlerUtils.recordStart();
         HandlerUtils.handleDelayWithTimer(() -> {
-            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, HandlerUtils.CT);
-            exchange.getResponseHeaders().put(Headers.SERVER, HandlerUtils.server);
-            exchange.getResponseSender().send(buf.duplicate());
+            try {
+                exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, HandlerUtils.CT);
+                exchange.getResponseHeaders().put(Headers.SERVER, HandlerUtils.server);
+                exchange.getResponseSender().send(buf.duplicate());
+            } finally {
+                HandlerUtils.recordEnd();
+            }
         });
     }
 

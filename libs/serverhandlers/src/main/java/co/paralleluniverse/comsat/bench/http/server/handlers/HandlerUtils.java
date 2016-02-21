@@ -10,9 +10,13 @@ import org.eclipse.jetty.http.PreEncodedHttpField;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 public final class HandlerUtils {
     public static final String HEAD_SERVER_KEY = "Server";
@@ -69,5 +73,43 @@ public final class HandlerUtils {
         }
     }
 
+    public static void printStats() {
+        System.err.println("** First request started: " + fmt(firstRequestStart.get()));
+        System.err.println("** Last request started: "  + fmt(lastRequestStart.get()));
+        System.err.println("** Total requests started: " + startedRequests.get());
+        System.err.println("** First request end: " + fmt(firstRequestEnd.get()));
+        System.err.println("** Last request end: " + fmt(lastRequestEnd.get()));
+        System.err.println("** Total requests completed: " + completedRequests.get());
+    }
+
+    public static void recordStart() {
+        final Date now = new Date();
+        firstRequestStart.compareAndSet(null, now);
+        lastRequestStart.set(now);
+        startedRequests.incrementAndGet();
+    }
+
+    public static void recordEnd() {
+        final Date now = new Date();
+        firstRequestEnd.compareAndSet(null, now);
+        lastRequestEnd.set(now);
+        completedRequests.incrementAndGet();
+    }
+
+    private static final AtomicReference<Date>
+        firstRequestStart = new AtomicReference<>(null),
+        lastRequestStart = new AtomicReference<>(null),
+        firstRequestEnd = new AtomicReference<>(null),
+        lastRequestEnd = new AtomicReference<>(null);
+    private static final AtomicLong
+        startedRequests = new AtomicLong(0L),
+        completedRequests = new AtomicLong(0L);
+
+    private static String fmt(Date d) {
+        return dateFormat.format(d);
+    }
+
     private HandlerUtils() {}
+
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 }

@@ -62,6 +62,8 @@ public abstract class LoadTargetBase {
         HandlerUtils.asyncTimeout = options.valueOf(t);
         HandlerUtils.workers = options.valueOf(w);
 
+        Runtime.getRuntime().addShutdownHook(new Thread(HandlerUtils::printStats));
+
         start(options.valueOf(p), options.valueOf(m), options.valueOf(i), options.valueOf(w));
     }
 }

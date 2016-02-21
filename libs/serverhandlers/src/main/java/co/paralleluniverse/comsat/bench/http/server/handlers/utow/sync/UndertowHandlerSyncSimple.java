@@ -9,9 +9,15 @@ import io.undertow.util.Headers;
 public class UndertowHandlerSyncSimple implements HttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        final HeaderMap headers = exchange.getResponseHeaders();
-        exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, HandlerUtils.CT);
-        headers.add(Headers.SERVER, HandlerUtils.server);
-        exchange.getResponseSender().send(HandlerUtils.TXT);
+        HandlerUtils.recordStart();
+        HandlerUtils.handleDelayWithThread();
+        try {
+            final HeaderMap headers = exchange.getResponseHeaders();
+            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, HandlerUtils.CT);
+            headers.add(Headers.SERVER, HandlerUtils.server);
+            exchange.getResponseSender().send(HandlerUtils.TXT);
+        } finally {
+            HandlerUtils.recordEnd();
+        }
     }
 }

@@ -16,9 +16,14 @@ public final class ServletComsatSync extends FiberHttpServlet {
     @Suspendable
     protected final void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
         HandlerUtils.handleDelayWithStrand();
+        HandlerUtils.recordStart();
 
-        resp.setContentType(HandlerUtils.CT);
-        resp.setHeader(HandlerUtils.HEAD_SERVER_KEY, HandlerUtils.server);
-        resp.getOutputStream().write(TXT);
+        try {
+            resp.setContentType(HandlerUtils.CT);
+            resp.setHeader(HandlerUtils.HEAD_SERVER_KEY, HandlerUtils.server);
+            resp.getOutputStream().write(TXT);
+        } finally {
+            HandlerUtils.recordEnd();
+        }
     }
 }

@@ -17,11 +17,16 @@ public final class JettyHandlerSync extends AbstractHandler {
     @Override
     public final void handle(String target, Request br, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HandlerUtils.handleDelayWithThread();
+        HandlerUtils.recordStart();
 
-        br.setHandled(true);
-        br.getResponse().getHttpFields().add(HandlerUtils.CTJ);
-        br.getResponse().getHttpFields().add(HandlerUtils.jettyServer);
-        if (HandlerUtils.URL.equals(target))
-            br.getResponse().getHttpOutput().sendContent(TXT.slice());
+        try {
+            br.setHandled(true);
+            br.getResponse().getHttpFields().add(HandlerUtils.CTJ);
+            br.getResponse().getHttpFields().add(HandlerUtils.jettyServer);
+            if (HandlerUtils.URL.equals(target))
+                br.getResponse().getHttpOutput().sendContent(TXT.slice());
+        } finally {
+            HandlerUtils.recordEnd();
+        }
     }
 }
