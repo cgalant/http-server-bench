@@ -10,24 +10,29 @@ public final class Main extends LoadTargetBase {
     }
 
     @Override
-    protected int getDefaultPort() {
-        return 8015;
-    }
-
-    @Override
-    protected int getDefaultIOParallelism() {
-        return 100;
-    }
-
-    @Override
-    protected int getDefaultWorkParallelism() {
+    protected final int getDefaultConnectionsBacklog() {
         return -1; // unused
     }
 
     @Override
-    protected void start(int port, int backlog, int maxIOP, int maxProcessingP) throws Exception {
-        Spark.startGet(port, maxIOP, new SparkHandlerSyncSimple());
-        System.err.println("WARNING: Spark servers don't use the 'maxIOParallelism' nor the 'maxProcessingParallelism' parameters");
+    protected final int getDefaultPort() {
+        return 8015;
+    }
+
+    @Override
+    protected final int getDefaultIOParallelism() {
+        return -1; // unused
+    }
+
+    @Override
+    protected final int getDefaultWorkParallelism() {
+        return 10000;
+    }
+
+    @Override
+    protected final void start(int port, int backlog, int maxIOP, int maxProcessingP) throws Exception {
+        Spark.startGet(port, maxProcessingP, new SparkHandlerSyncSimple());
+        System.err.println("WARNING: Spark servers don't use the 'backlog' nor the 'maxIOParallelism' parameters");
         AbstractEmbeddedServer.waitUrlAvailable("http://localhost:" + port + HandlerUtils.URL);
         System.err.println("SERVER UP");
     }
