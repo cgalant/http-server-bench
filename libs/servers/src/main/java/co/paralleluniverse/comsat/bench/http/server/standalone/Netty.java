@@ -23,7 +23,7 @@ public final class Netty {
         b.childOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, 0);
         b.childOption(ChannelOption.TCP_NODELAY, true);
         b.childOption(ChannelOption.SO_REUSEADDR, true);
-        b.childOption(ChannelOption.SO_LINGER, 0);
+        // b.childOption(ChannelOption.SO_LINGER, 0);
         // b.childOption(ChannelOption.WRITE_BUFFER_HIGH_WATER_MARK, 32 * 1024);
         // b.childOption(ChannelOption.WRITE_BUFFER_LOW_WATER_MARK, 8 * 1024);
         b.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
