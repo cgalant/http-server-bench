@@ -11,3 +11,8 @@ tomcat.8080/
 /kilim/lib
 /build/
 .gradle/
+*.log
+*.clog
+*.slog
+*.jfr
+*.hprof
