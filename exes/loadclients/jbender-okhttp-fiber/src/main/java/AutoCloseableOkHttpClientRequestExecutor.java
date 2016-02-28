@@ -7,6 +7,9 @@ import com.pinterest.jbender.executors.Validator;
 import com.squareup.okhttp.*;
 
 import java.io.IOException;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.util.concurrent.TimeUnit;
 
 public class AutoCloseableOkHttpClientRequestExecutor extends AutoCloseableRequestExecutor<Request, Response> {
@@ -23,7 +26,7 @@ public class AutoCloseableOkHttpClientRequestExecutor extends AutoCloseableReque
   protected final Validator<Response> validator;
   protected final OkHttpClient client;
 
-  public AutoCloseableOkHttpClientRequestExecutor(OkHttpClient client, Validator<Response> resValidator, int maxConnections, int timeout) {
+  public AutoCloseableOkHttpClientRequestExecutor(OkHttpClient client, Validator<Response> resValidator, int maxConnections, int timeout, boolean cookies) {
     this.validator = resValidator;
     this.client = client;
 
@@ -35,10 +38,16 @@ public class AutoCloseableOkHttpClientRequestExecutor extends AutoCloseableReque
     this.client.setConnectTimeout(timeout, TimeUnit.MILLISECONDS);
     this.client.setReadTimeout(timeout, TimeUnit.MILLISECONDS);
     this.client.setWriteTimeout(timeout, TimeUnit.MILLISECONDS);
+
+    CookieManager cookieManager = new CookieManager();
+    CookieHandler.setDefault(cookieManager);
+    if (!cookies)
+      cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_NONE);
+    this.client.setCookieHandler(cookieManager);
   }
 
-  public AutoCloseableOkHttpClientRequestExecutor(Validator<Response> resValidator, int maxReqs, int timeout) {
-    this(new FiberOkHttpClient(), resValidator, maxReqs, timeout);
+  public AutoCloseableOkHttpClientRequestExecutor(Validator<Response> resValidator, int maxReqs, int timeout, boolean cookies) {
+    this(new FiberOkHttpClient(), resValidator, maxReqs, timeout, cookies);
   }
 
   public Response execute0(long nanoTime, Request request) throws InterruptedException, SuspendExecution {

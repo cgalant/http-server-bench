@@ -57,6 +57,7 @@ public abstract class ClientBase<Req, Res, Exec extends AutoCloseableRequestExec
     final OptionSpec<Integer> n = parser.acceptsAll(asList("n", "maxConcurrency")).withOptionalArg().ofType(Integer.class).describedAs("Maximum concurrency level");
     final OptionSpec<Integer> w = parser.acceptsAll(asList("w", "warmup")).withOptionalArg().ofType(Integer.class).describedAs("The number of requests used to warm up the load tester").defaultsTo(1_000);
     final OptionSpec<Integer> c = parser.acceptsAll(asList("c", "count")).withRequiredArg().ofType(Integer.class).describedAs("Requests count").defaultsTo(11_000);
+    final OptionSpec<Boolean> k = parser.acceptsAll(asList("k", "cooKies")).withRequiredArg().ofType(Boolean.class).describedAs("Accept cookies (e.g. sessions)").defaultsTo(false);
     parser.acceptsAll(asList(P, "preGenerateRequests"));
 
     final OptionSpec<String> u = parser.acceptsAll(asList("u", "url")).withRequiredArg().ofType(String.class).describedAs("URI").defaultsTo("http://localhost:9000");
@@ -118,6 +119,7 @@ public abstract class ClientBase<Req, Res, Exec extends AutoCloseableRequestExec
         "\t* Request timeout (-t): " + options.valueOf(t) + " ms\n" +
         "\t* Requests count (-c): " + options.valueOf(c) + "\n" +
         "\t\t- Warmup requests (-w): " + options.valueOf(w) + "\n" +
+        "\t* Handle cookies (e.g. session, -k): " + options.valueOf(k) + "\n" +
         "\t* HDR histogram settings:\n" +
         "\t\t- Maximum (-x): " + options.valueOf(x) + "\n" +
         "\t\t- Digits (-d): " + options.valueOf(d) + "\n" +
@@ -138,7 +140,7 @@ public abstract class ClientBase<Req, Res, Exec extends AutoCloseableRequestExec
 
     env = setupEnv(options);
     try (final Exec requestExecutor =
-        env.newRequestExecutor(options.valueOf(i), options.valueOf(m), options.valueOf(t))) {
+        env.newRequestExecutor(options.valueOf(i), options.valueOf(m), options.valueOf(t), options.valueOf(k))) {
 
       final int warms = options.valueOf(w);
       final int recordedReqs = reqs - warms;

@@ -9,16 +9,17 @@ import org.apache.http.impl.nio.reactor.IOReactorConfig;
 
 public class FiberApacheEnv implements Env<HttpGet, AutoCloseableApacheHttpClientRequestExecutor<HttpGet>> {
   @Override
-  public AutoCloseableApacheHttpClientRequestExecutor<HttpGet> newRequestExecutor(int ioParallelism, int maxConnections, int timeout) throws Exception {
+  public AutoCloseableApacheHttpClientRequestExecutor<HttpGet> newRequestExecutor(int ioParallelism, int maxConnections, int timeout, boolean cookies) throws Exception {
     final DefaultConnectingIOReactor ioReactor = new DefaultConnectingIOReactor(IOReactorConfig.custom().setConnectTimeout(timeout).setIoThreadCount(ioParallelism).setSoTimeout(timeout).build());
     final PoolingNHttpClientConnectionManager mgr = new PoolingNHttpClientConnectionManager(ioReactor);
     mgr.setDefaultMaxPerRoute(maxConnections);
     mgr.setMaxTotal(maxConnections);
 
-    CloseableHttpAsyncClient ahc =
-      HttpAsyncClientBuilder
+    HttpAsyncClientBuilder builder = HttpAsyncClientBuilder
         .create()
-        .setConnectionManager(mgr)
+        .setConnectionManager(mgr);
+    builder = cookies ? builder : builder.disableCookieManagement();
+    final CloseableHttpAsyncClient ahc = builder
         .setDefaultRequestConfig(AutoCloseableApacheHttpClientRequestExecutor.defaultRequestConfig(timeout))
         .build();
 
