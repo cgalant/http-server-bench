@@ -5,6 +5,8 @@ import co.paralleluniverse.comsat.webactors.netty.AutoWebActorHandler;
 import co.paralleluniverse.embedded.containers.AbstractEmbeddedServer;
 import io.netty.channel.ChannelFuture;
 
+import java.util.Map;
+
 public final class Main extends LoadTargetBase {
     public static void main(String[] args) throws Exception {
         new Main().run(args);
@@ -28,9 +30,15 @@ public final class Main extends LoadTargetBase {
     @Override
     protected void start(int port, int backlog, int maxIOP, int maxProcessingP) throws Exception {
         System.err.println("WARNING: Netty servers don't use the 'maxProcessingParallelism' parameter");
-        final ChannelFuture cf = Netty.singleHandlerServer(port, backlog, maxIOP, AutoWebActorHandler::new);
+        final ChannelFuture cf = Netty.singleHandlerServer(port, backlog, maxIOP, () -> new AutoWebActorHandler() {
+            @Override
+            protected AutoContextProvider newContextProvider(ClassLoader userClassLoader, Map<Class<?>, Object[]> actorParams) {
+                return new AutoContextProvider(userClassLoader, actorParams, 1_000L /* ms */);
+            }
+        });
         cf.sync();
         AbstractEmbeddedServer.waitUrlAvailable("http://localhost:" + port + HandlerUtils.URL);
         System.err.println("SERVER UP");
     }
 }
+

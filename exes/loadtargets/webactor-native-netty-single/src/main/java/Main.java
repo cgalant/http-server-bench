@@ -48,15 +48,25 @@ public final class Main extends LoadTargetBase {
     private static final WebActorHandler.DefaultContextImpl context = new MyDefaultContextImpl();
     private static class MyWebActorContextProvider implements WebActorHandler.WebActorContextProvider {
         @Override
-        public WebActorHandler.Context get(ChannelHandlerContext ctx, FullHttpRequest req) {
+        public WebActorHandler.Context get(FullHttpRequest req) {
             return context;
         }
     }
 
     private static class MyDefaultContextImpl extends WebActorHandler.DefaultContextImpl {
+        @Override
+        public final String getId() {
+            return "CONSTANT";
+        }
+
+        @Override
+        public final void restart(FullHttpRequest r) {
+            // Nothing to do
+        }
+
         @SuppressWarnings("unchecked")
         @Override
-        public ActorRef<? extends WebMessage> getRef() {
+        public final ActorRef<? extends WebMessage> getWebActor() {
             return actorRef;
         }
 
@@ -71,8 +81,8 @@ public final class Main extends LoadTargetBase {
         }
 
         @Override
-        public final boolean watch() {
-            return false;
+        public final WebActorHandler.Context.WatchPolicy watch() {
+            return WatchPolicy.DONT_WATCH;
         }
     }
 }
