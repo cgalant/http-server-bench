@@ -39,7 +39,7 @@ public final class Tomcat {
         final StandardContext context = (StandardContext) getContext(contextRoot, t);
 
         addApplicationListener(c, context);
-        context.setSessionTimeout(1 /* Minimum = 1 minute */);
+        context.setSessionTimeout(1 /* mins */);
 
         configure(port, backlog, maxProcessingP, t);
 
