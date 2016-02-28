@@ -7,6 +7,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.nio.reactor.IOReactorException;
+import org.apache.http.util.EntityUtils;
+
 import java.io.IOException;
 
 public class AutoCloseableApacheHttpClientRequestExecutor<X extends HttpRequestBase> extends AutoCloseableRequestExecutor<X, CloseableHttpResponse> {
@@ -26,8 +28,13 @@ public class AutoCloseableApacheHttpClientRequestExecutor<X extends HttpRequestB
 
   public static final Validator<CloseableHttpResponse> DEFAULT_VALIDATOR = r -> {
     final int sc = r.getStatusLine().getStatusCode();
-    if (sc != 200 && sc != 204)
-      throw new AssertionError("Request didn't complete successfully: " + r.getStatusLine().toString());
+    if (sc != 200 && sc != 204) {
+      String body = null;
+      try {
+        body = EntityUtils.toString(r.getEntity());
+      } catch (final IOException ignored) {}
+      throw new AssertionError("Request didn't complete successfully: " + r.getStatusLine().toString() + ", " + body);
+    }
   };
 
   public AutoCloseableApacheHttpClientRequestExecutor(CloseableHttpClient client, Validator<CloseableHttpResponse> resValidator) throws IOReactorException {

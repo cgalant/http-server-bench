@@ -11,8 +11,13 @@ import java.util.concurrent.TimeUnit;
 
 public class AutoCloseableOkHttpClientRequestExecutor extends AutoCloseableRequestExecutor<Request, Response> {
   public static final Validator<Response> DEFAULT_VALIDATOR = (Response r) -> {
-    if (!r.isSuccessful())
-      throw new AssertionError("Request didn't complete successfully");
+    if (!r.isSuccessful()) {
+      String body = null;
+      try {
+        body = r.body().string();
+      } catch (final IOException ignored) {}
+      throw new AssertionError("Request didn't complete successfully: " + r.code() + ", " + r.message() + ", " + body);
+    }
   };
 
   protected final Validator<Response> validator;
