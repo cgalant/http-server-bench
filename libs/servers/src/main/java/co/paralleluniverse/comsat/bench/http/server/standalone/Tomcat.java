@@ -52,7 +52,7 @@ public final class Tomcat {
         t.getConnector().setAttribute("acceptCount", backlog);
 
         t.getConnector().setAttribute("connectionLinger", 0);
-        t.getConnector().setAttribute("connectionTimeout", 3600000);
+        t.getConnector().setAttribute("connectionTimeout", ServerUtils.TIMEOUT);
     }
 
     private static void addApplicationListener(Class<? extends ServletContextListener> c, StandardContext context) throws InstantiationException, IllegalAccessException {

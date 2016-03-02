@@ -56,6 +56,7 @@ public final class Jetty {
     private static Server server(int port, int backlog, int maxProcessingP) {
         final Server s = new Server(new QueuedThreadPool(maxProcessingP, Runtime.getRuntime().availableProcessors()));
         final ServerConnector http = new ServerConnector(s);
+        http.setIdleTimeout(ServerUtils.TIMEOUT);
         http.setAcceptQueueSize(backlog);
         http.setPort(port);
         s.addConnector(http);
