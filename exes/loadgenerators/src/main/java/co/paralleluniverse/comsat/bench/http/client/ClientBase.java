@@ -22,7 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,6 +33,8 @@ import static com.pinterest.jbender.events.recording.Recorder.record;
 import static java.util.Arrays.asList;
 
 public abstract class ClientBase<Req, Res, Exec extends AutoCloseableRequestExecutor<Req, Res>, E extends Env<Req, Exec>> {
+  private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+
   private static final ExecutorService e = Executors.newCachedThreadPool();
   public static final StrandFactory DEFAULT_FIBERS_SF = DefaultFiberScheduler.getInstance();
 
@@ -181,7 +185,7 @@ public abstract class ClientBase<Req, Res, Exec extends AutoCloseableRequestExec
       }
 
       // Main
-      new Fiber<Void>("jbender", () -> {
+      final Fiber<Void> jbender = new Fiber<>("jbender", () -> {
         if (options.has(n)) {
           System.err.println("=============== CONCURRENCY TEST ==============");
           JBender.loadTestConcurrency(options.valueOf(n), warms, requestCh, requestExecutor, eventCh, sf);
@@ -196,11 +200,24 @@ public abstract class ClientBase<Req, Res, Exec extends AutoCloseableRequestExec
 
           JBender.loadTestThroughput(intervalGen, warms, requestCh, requestExecutor, eventCh, sf);
         }
-      }).start().join();
+      });
+      jbender.start();
+      final Date start = new Date();
+      jbender.join();
 
       recorder.join();
 
       histogram.outputPercentileDistribution(System.err, options.valueOf(s));
+
+      System.err.println("\n* Successful requests: " + resExecProgressLogger.succ.get());
+      System.err.println("* Failed requests: " + resExecProgressLogger.err.get());
+      System.err.println("* Load started: " + dateFormat.format(start));
+      final Date firstReqEnd = resExecProgressLogger.start.get();
+      System.err.println("* First request ended: " + dateFormat.format(firstReqEnd));
+      final Date lastReqEnd = resExecProgressLogger.end.get();
+      System.err.println("* Last request ended: " + dateFormat.format(lastReqEnd));
+      System.err.println("* Seconds from load start: " + ((lastReqEnd.getTime() - start.getTime()) / 1_000.0D));
+      System.err.println("* Seconds from first request completed: " + ((lastReqEnd.getTime() - firstReqEnd.getTime()) / 1_000.0D));
 
       e.shutdown();
     } catch (final Throwable e) {

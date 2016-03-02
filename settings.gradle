@@ -6,9 +6,9 @@ include 'libs:serverhandlers'
 
 include 'exes'
 
-include 'exes:loadclients'
-include 'exes:loadclients:jbender-okhttp-fiber'
-include 'exes:loadclients:jbender-apache-fiber'
+include 'exes:loadgenerators'
+include 'exes:loadgenerators:jbender-okhttp-fiber'
+include 'exes:loadgenerators:jbender-apache-fiber'
 
 include 'exes:loadtargets'
 

@@ -6,6 +6,7 @@ import com.pinterest.jbender.events.recording.Recorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicLong;
@@ -14,12 +15,15 @@ import java.util.concurrent.atomic.AtomicReference;
 final class ProgressLogger<Res, Exec extends AutoCloseableRequestExecutor<?, Res>> implements Recorder<Res> {
   private static final Logger log = LoggerFactory.getLogger(ProgressLogger.class);
 
-  private AtomicLong succ = new AtomicLong(0);
-  private AtomicLong err = new AtomicLong(0);
+  AtomicLong succ = new AtomicLong(0);
+  AtomicLong err = new AtomicLong(0);
+
+  AtomicReference<Date>
+      start = new AtomicReference<>(),
+      end = new AtomicReference<>();
 
   private long notified = 0;
   private long notifiedNanos = System.nanoTime();
-
   private long avgDurationNanos = Long.MAX_VALUE;
 
   private AtomicReference<Utils.SysStats> stats = new AtomicReference<>(null);
@@ -88,6 +92,10 @@ final class ProgressLogger<Res, Exec extends AutoCloseableRequestExecutor<?, Res
 
   @Override
   public void record(final TimingEvent<Res> timingEvent) {
+    final Date now = new Date();
+    start.compareAndSet(null, now);
+    end.set(now);
+
     final long succeeded = succ.get();
     final long errored = err.get();
 
