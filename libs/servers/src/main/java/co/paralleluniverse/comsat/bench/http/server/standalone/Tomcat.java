@@ -50,6 +50,7 @@ public final class Tomcat {
         t.setPort(port);
         t.getConnector().setAttribute("maxThreads", maxProcessingP);
         t.getConnector().setAttribute("acceptCount", backlog);
+        t.getConnector().setAttribute("tcpNoDelay", true);
 
         t.getConnector().setAttribute("connectionTimeout", ServerUtils.TIMEOUT);
     }
