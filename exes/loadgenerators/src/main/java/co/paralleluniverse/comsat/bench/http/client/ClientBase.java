@@ -209,6 +209,7 @@ public abstract class ClientBase<Req, Res, Exec extends AutoCloseableRequestExec
 
       histogram.outputPercentileDistribution(System.err, options.valueOf(s));
 
+      // More stats
       System.err.println("\n* Successful requests: " + resExecProgressLogger.succ.get());
       System.err.println("* Failed requests: " + resExecProgressLogger.err.get());
       System.err.println("* Load started: " + dateFormat.format(start));
@@ -217,7 +218,7 @@ public abstract class ClientBase<Req, Res, Exec extends AutoCloseableRequestExec
       final Date lastReqEnd = resExecProgressLogger.end.get();
       System.err.println("* Last request ended: " + dateFormat.format(lastReqEnd));
       System.err.println("* Seconds from load start: " + ((lastReqEnd.getTime() - start.getTime()) / 1_000.0D));
-      System.err.println("* Seconds from first request completed: " + ((lastReqEnd.getTime() - firstReqEnd.getTime()) / 1_000.0D));
+      System.err.println("* Seconds from first request completed: " + ((lastReqEnd.getTime() - firstReqEnd.getTime()) / 1_000.0D) + "\n");
 
       e.shutdown();
     } catch (final Throwable e) {

@@ -24,9 +24,11 @@ final class ProgressLogger<Res, Exec extends AutoCloseableRequestExecutor<?, Res
 
   private long notified = 0;
   private long notifiedNanos = System.nanoTime();
-  private long avgDurationNanos = Long.MAX_VALUE;
+  private long avgDurationNanos = -1;
 
   private AtomicReference<Utils.SysStats> stats = new AtomicReference<>(null);
+
+  private AtomicLong durationsSum = new AtomicLong(0);
 
   public ProgressLogger(Exec requestExecutor, int total, boolean sysMon, int cmsi, int cmpi) {
     log.info("Starting progress report");
@@ -75,8 +77,9 @@ final class ProgressLogger<Res, Exec extends AutoCloseableRequestExecutor<?, Res
 
             final double succeededPercent = Math.round(((double) (succeeded)) / ((double) total) * 100.0D * 100.D) / 100.D;
             final double erroredPercent = Math.round(((double) (errored)) / ((double) total) * 100.0D * 100.D) / 100.D;
+            final String avgRPSStr = avgDurationNanos > 0 ? Double.toString(1.0D / (avgDurationNanos) * 1_000_000_000_000L) : "N/A";
 
-            log.info((succeeded + errored) + "/" + finishedRoundedPercent + "% (" + succeeded + "/" + succeededPercent + "% OK + " + errored + "/" + erroredPercent + "% KO) / " + total + " (" + newFinished + " reqs in " + newTimeNanos + " nanos, " + (1.0D / (avgDurationNanos / 1_000_000_000.0D)) + " rps, concurrency = " + requestExecutor.getCurrentConcurrency() + ", max = " + requestExecutor.getMaxConcurrency() + ")");
+            log.info((succeeded + errored) + "/" + finishedRoundedPercent + "% (" + succeeded + "/" + succeededPercent + "% OK + " + errored + "/" + erroredPercent + "% KO) / " + total + " (+" + newFinished + " reqs in " + newTimeNanos + " nanos, " + avgRPSStr + " avg rps, concurrency = " + requestExecutor.getCurrentConcurrency() + ", max = " + requestExecutor.getMaxConcurrency() + ")");
 
             if (sysMon) {
               final Utils.SysStats s = stats.get();
@@ -96,10 +99,14 @@ final class ProgressLogger<Res, Exec extends AutoCloseableRequestExecutor<?, Res
     start.compareAndSet(null, now);
     end.set(now);
 
+    durationsSum.addAndGet(timingEvent.durationNanos);
+
     final long succeeded = succ.get();
     final long errored = err.get();
+    final long total = succeeded + errored;
 
-    avgDurationNanos = (avgDurationNanos * (succeeded + errored) + timingEvent.durationNanos) / (succeeded + errored + 1);
+    long l = durationsSum.get();
+    avgDurationNanos = total > 0 && l > 0 ? l / total : avgDurationNanos;
 
     if (timingEvent.isSuccess)
       succ.incrementAndGet();
