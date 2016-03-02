@@ -39,7 +39,7 @@ public final class Jetty {
 
     private static void addApplicationEventListener(Class<? extends ServletContextListener> c, Server s) throws IllegalAccessException, InstantiationException {
         final ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.getSessionHandler().getSessionManager().setMaxInactiveInterval(1 /* secs */);
+        context.getSessionHandler().getSessionManager().setMaxInactiveInterval(60 /* secs */);
         context.addEventListener(c.newInstance());
         s.setHandler(context);
     }

@@ -77,7 +77,7 @@ public final class Undertow {
         final ListenerInfo li = Servlets.listener(c);
         deployment.addListener(li);
         // The code below must follow the code above
-        final DeploymentManager servletsContainer = Servlets.defaultContainer().addDeployment(deployment.setDefaultSessionTimeout(1) /* secs */);
+        final DeploymentManager servletsContainer = Servlets.defaultContainer().addDeployment(deployment.setDefaultSessionTimeout(60) /* secs */);
         servletsContainer.deploy();
         return servletsContainer;
     }

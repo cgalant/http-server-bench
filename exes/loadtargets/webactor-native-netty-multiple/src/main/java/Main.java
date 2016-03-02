@@ -33,7 +33,7 @@ public final class Main extends LoadTargetBase {
         final ChannelFuture cf = Netty.singleHandlerServer(port, backlog, maxIOP, () -> new AutoWebActorHandler() {
             @Override
             protected AutoContextProvider newContextProvider(ClassLoader userClassLoader, Map<Class<?>, Object[]> actorParams) {
-                return new AutoContextProvider(userClassLoader, actorParams, 1_000L /* ms */);
+                return new AutoContextProvider(userClassLoader, actorParams, 1_000_000L /* ms */);
             }
         });
         cf.sync();
