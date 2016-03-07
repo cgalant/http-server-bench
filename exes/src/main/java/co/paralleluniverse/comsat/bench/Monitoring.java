@@ -128,11 +128,22 @@ public final class Monitoring {
     }
 
     public static void resetSampleSys() {
+        missedGCs = false;
+        maxGCTimeMS = Optional.empty();
         samples = 0L;
+        totalGCs = 0L;
+        totalGCTimeMS = 0L;
+        maxDaemonThreads = 0L;
         maxCpu = 0.0D;
         maxMemMB = 0.0D;
+        maxHeapMemMB = 0.0D;
+        maxNonHeapMemMB = 0.0D;
         totCpu = 0.0D;
         totMemMB = 0.0D;
+        totHeapMemMB = 0.0D;
+        totNonHeapMemMB = 0.0D;
+        totThreads = 0L;
+        totDaemonThreads = 0L;
     }
 
     private Monitoring() {}
