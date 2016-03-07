@@ -65,7 +65,7 @@ public final class ServletAsyncDispatch extends HttpServlet {
             return;
         }
 
-        HandlerUtils.recordStart();
+        HandlerUtils.reqStart();
         HandlerUtils.handleDelayWithThread();
         {
             response.setContentType(HandlerUtils.CT);
@@ -76,7 +76,7 @@ public final class ServletAsyncDispatch extends HttpServlet {
                 e.printStackTrace();
                 throw new RuntimeException(e);
             } finally {
-                HandlerUtils.recordEnd();
+                HandlerUtils.reqEnd();
             }
         }
     }

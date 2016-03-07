@@ -1,4 +1,4 @@
-import co.paralleluniverse.comsat.bench.http.client.ClientBase;
+import co.paralleluniverse.comsat.bench.http.loadgen.LoadGeneratorBase;
 import co.paralleluniverse.fibers.SuspendExecution;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -7,7 +7,7 @@ import joptsimple.OptionSet;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-public class Main extends ClientBase<Request, Response, AutoCloseableOkHttpClientRequestExecutor, FiberOkHttpEnv> {
+public class Main extends LoadGeneratorBase<Request, Response, AutoCloseableOkHttpClientRequestExecutor, FiberOkHttpEnv> {
   @Override
   protected FiberOkHttpEnv setupEnv(OptionSet options) {
     return new FiberOkHttpEnv();

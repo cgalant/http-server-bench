@@ -46,7 +46,7 @@ public final class JettyHandlerAsyncTimerComplete extends AbstractHandler {
     }
 
     final void reply(AsyncContext async) {
-        HandlerUtils.recordStart();
+        HandlerUtils.reqStart();
         HandlerUtils.handleDelayWithTimer(() -> {
             try {
                 final Request br = (Request) async.getRequest();
@@ -60,7 +60,7 @@ public final class JettyHandlerAsyncTimerComplete extends AbstractHandler {
                 e.printStackTrace();
                 throw new RuntimeException(e);
             } finally {
-                HandlerUtils.recordEnd();
+                HandlerUtils.reqEnd();
             }
         });
     }

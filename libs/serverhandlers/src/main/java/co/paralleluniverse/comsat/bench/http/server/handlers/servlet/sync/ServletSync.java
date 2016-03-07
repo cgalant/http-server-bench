@@ -13,7 +13,7 @@ public final class ServletSync extends HttpServlet {
 
     @Override
     protected final void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        HandlerUtils.recordStart();
+        HandlerUtils.reqStart();
         HandlerUtils.handleDelayWithThread();
 
         try {
@@ -21,7 +21,7 @@ public final class ServletSync extends HttpServlet {
             resp.setHeader(HandlerUtils.HEAD_SERVER_KEY, HandlerUtils.server);
             resp.getOutputStream().write(TXT);
         } finally {
-            HandlerUtils.recordEnd();
+            HandlerUtils.reqEnd();
         }
     }
 }

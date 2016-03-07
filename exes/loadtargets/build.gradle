@@ -5,9 +5,13 @@ dependencies {
 
     compile "co.paralleluniverse:comsat-test-utils:$comsatVer"
 
+    compile "io.dropwizard:dropwizard-core:$dropwizardVer"
+
     compile project(":libs:servers")
 
     compile project(":exes")
+
+    runtime "ch.qos.logback:logback-classic:$logbackVer"
 }
 
 fatCapsule.enabled = false

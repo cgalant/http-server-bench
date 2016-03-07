@@ -3,6 +3,7 @@ package co.paralleluniverse.comsat.bench.http.server.handlers;
 import co.paralleluniverse.fibers.SuspendExecution;
 import co.paralleluniverse.fibers.Suspendable;
 import co.paralleluniverse.strands.Strand;
+import com.google.common.util.concurrent.AtomicDouble;
 import org.eclipse.jetty.http.HttpField;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.MimeTypes;
@@ -10,7 +11,6 @@ import org.eclipse.jetty.http.PreEncodedHttpField;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -73,27 +73,37 @@ public final class HandlerUtils {
         }
     }
 
-    public static void printStats() {
-        System.err.println("** First request started: " + fmt(firstRequestStart.get()));
-        System.err.println("** Last request started: "  + fmt(lastRequestStart.get()));
-        System.err.println("** Total requests started: " + startedRequests.get());
-        System.err.println("** First request end: " + fmt(firstRequestEnd.get()));
-        System.err.println("** Last request end: " + fmt(lastRequestEnd.get()));
-        System.err.println("** Total requests completed: " + completedRequests.get());
-    }
-
-    public static void recordStart() {
+    public static void reqStart() {
         final Date now = new Date();
         firstRequestStart.compareAndSet(null, now);
         lastRequestStart.set(now);
         startedRequests.incrementAndGet();
+
+        concurrency.incrementAndGet();
+        totConcurrency.addAndGet(concurrency.get());
+        maxConcurrency.updateAndGet(val -> {
+            long curr = concurrency.get();
+            if (val < curr)
+                return curr;
+            else
+                return val;
+        });
+        avgConcurrency.set(Math.round(totConcurrency.get() / startedRequests.get() * 100.D) / 100.D);
     }
 
-    public static void recordEnd() {
+    public static void reqEnd() {
         final Date now = new Date();
         firstRequestEnd.compareAndSet(null, now);
         lastRequestEnd.set(now);
         completedRequests.incrementAndGet();
+
+        concurrency.decrementAndGet();
+    }
+
+    public static final class HandlerStats {
+        public Date firstRequestStart, firstRequestEnd, lastRequestStart, lastRequestEnd;
+        public long startedRequests, completedRequests, concurrency, maxConcurrency;
+        public double avgConcurrency;
     }
 
     private static final AtomicReference<Date>
@@ -104,12 +114,39 @@ public final class HandlerUtils {
     private static final AtomicLong
         startedRequests = new AtomicLong(0L),
         completedRequests = new AtomicLong(0L);
+    private static final AtomicLong
+        concurrency = new AtomicLong(0L),
+        maxConcurrency = new AtomicLong(0L),
+        totConcurrency = new AtomicLong(0L);
+    private static final AtomicDouble
+        avgConcurrency = new AtomicDouble(0.0D);
 
-    private static String fmt(Date d) {
-        return d != null ? dateFormat.format(d) : null;
+    public static void resetStats() {
+        firstRequestStart.set(null);
+        lastRequestStart.set(null);
+        firstRequestEnd.set(null);
+        lastRequestEnd.set(null);
+        startedRequests.set(0L);
+        completedRequests.set(0L);
+        concurrency.set(0L);
+        maxConcurrency.set(0L);
+        totConcurrency.set(0L);
+        avgConcurrency.set(0.0D);
+    }
+
+    public static HandlerStats getStats() {
+        final HandlerStats ret = new HandlerStats();
+        ret.avgConcurrency = avgConcurrency.get();
+        ret.completedRequests = completedRequests.get();
+        ret.concurrency = concurrency.get();
+        ret.firstRequestEnd = firstRequestEnd.get();
+        ret.firstRequestStart = firstRequestStart.get();
+        ret.lastRequestEnd = lastRequestEnd.get();
+        ret.lastRequestStart = lastRequestStart.get();
+        ret.maxConcurrency = maxConcurrency.get();
+        ret.startedRequests = startedRequests.get();
+        return ret;
     }
 
     private HandlerUtils() {}
-
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 }

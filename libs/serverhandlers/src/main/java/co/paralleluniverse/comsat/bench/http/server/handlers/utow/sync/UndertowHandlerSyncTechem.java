@@ -23,14 +23,14 @@ public class UndertowHandlerSyncTechem implements HttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        HandlerUtils.recordStart();
+        HandlerUtils.reqStart();
         HandlerUtils.handleDelayWithThread();
         try {
             exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, HandlerUtils.CT);
             exchange.getResponseHeaders().put(Headers.SERVER, HandlerUtils.server);
             exchange.getResponseSender().send(buffer.duplicate());
         } finally {
-            HandlerUtils.recordEnd();
+            HandlerUtils.reqEnd();
         }
     }
 }

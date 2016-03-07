@@ -16,6 +16,8 @@ allprojects {
     ext.capsuleVer      = '1.0.2-SNAPSHOT'
 
     ext.joptVer         = '4.9'
+    ext.dropwizardVer   = '1.0.0-SNAPSHOT'
+    ext.logbackVer      = '1.1.6'
 
 //    ext.clojureVer      = '1.7.0'
 //
@@ -61,6 +63,17 @@ allprojects {
             force "org.apache.httpcomponents:httpclient:$httpClientVer"
             force "org.hdrhistogram:HdrHistogram:$hdrVer"
             force "co.paralleluniverse:quasar-core:$quasarVer"
+            force "ch.qos.logback:logback-classic:$logbackVer"
+            force "ch.qos.logback:logback-core:$logbackVer"
+
+            // Transitive deps (Dropwizard) conflicts
+            force "org.glassfish.jersey.core:jersey-server:2.22.2"
+            force "org.glassfish.jersey.core:jersey-client:2.22.2"
+            force "org.glassfish.jersey.core:jersey-common:2.22.2"
+            force "org.glassfish.hk2:hk2-api:2.4.0-b34"
+            force "org.glassfish.hk2:hk2-locator:2.4.0-b34"
+            force "org.glassfish.hk2.external:javax.inject:2.4.0-b34"
+            force "com.google.guava:guava:19.0"
 //
 //            force "org.clojure:clojure:$clojureVer"
 //            force "co.paralleluniverse:pulsar:$quasarVer"

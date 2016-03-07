@@ -1,0 +1,20 @@
+server:
+  maxThreads: 4
+  minThreads: 1
+  maxQueuedRequests: 10
+  applicationConnectors:
+  - type: http
+    port: 9000
+    idleTimeout: 3600 seconds
+    acceptQueueSize: 10
+    reuseAddress: true
+    outputBufferSize: 8KiB
+    inputBufferSize: 1KiB
+    maxRequestHeaderSize: 1KiB
+    maxResponseHeaderSize: 1KiB
+    useDateHeader: false
+    useForwardedHeaders: false
+    acceptorThreads: 1
+  adminConnectors: []
+  requestLog:
+    appenders: []

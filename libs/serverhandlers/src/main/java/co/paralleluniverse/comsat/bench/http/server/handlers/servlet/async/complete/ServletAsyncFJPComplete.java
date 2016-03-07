@@ -45,7 +45,7 @@ public final class ServletAsyncFJPComplete extends HttpServlet {
 
     private static void exec(AsyncContext ac) {
         pool.execute(() -> {
-            HandlerUtils.recordStart();
+            HandlerUtils.reqStart();
             HandlerUtils.handleDelayWithTimer(() -> {
                 final HttpServletResponse sr = (HttpServletResponse) ac.getResponse();
                 sr.setContentType(HandlerUtils.CT);
@@ -57,7 +57,7 @@ public final class ServletAsyncFJPComplete extends HttpServlet {
                     e.printStackTrace();
                     throw new RuntimeException(e);
                 } finally {
-                    HandlerUtils.recordEnd();
+                    HandlerUtils.reqEnd();
                 }
             });
         });

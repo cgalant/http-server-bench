@@ -15,7 +15,7 @@ public abstract class HelloWebActor extends BasicActor<Object, Void> {
     private static final byte[] TXT = HandlerUtils.TXT.getBytes();
 
     protected final Void handleOne() throws InterruptedException, SuspendExecution {
-        HandlerUtils.recordStart();
+        HandlerUtils.reqStart();
         try {
             final Object message = receive();
             if (message instanceof HttpRequest) {
@@ -33,7 +33,7 @@ public abstract class HelloWebActor extends BasicActor<Object, Void> {
             }
             return null;
         } finally {
-            HandlerUtils.recordEnd();
+            HandlerUtils.reqEnd();
         }
     }
 }

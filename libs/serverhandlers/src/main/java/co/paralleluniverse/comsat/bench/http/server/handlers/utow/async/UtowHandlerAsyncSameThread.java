@@ -31,14 +31,14 @@ public final class UtowHandlerAsyncSameThread implements HttpHandler {
     }
 
     final void reply(HttpServerExchange exchange) {
-        HandlerUtils.recordStart();
+        HandlerUtils.reqStart();
         HandlerUtils.handleDelayWithTimer(() -> {
             try {
                 exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, HandlerUtils.CT);
                 exchange.getResponseHeaders().put(Headers.SERVER, HandlerUtils.server);
                 exchange.getResponseSender().send(buf.duplicate());
             } finally {
-                HandlerUtils.recordEnd();
+                HandlerUtils.reqEnd();
             }
         });
     }

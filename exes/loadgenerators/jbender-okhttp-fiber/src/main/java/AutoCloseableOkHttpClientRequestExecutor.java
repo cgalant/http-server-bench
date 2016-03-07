@@ -1,5 +1,5 @@
-import co.paralleluniverse.comsat.bench.http.client.AutoCloseableRequestExecutor;
-import co.paralleluniverse.comsat.bench.http.client.ClientBase;
+import co.paralleluniverse.comsat.bench.http.loadgen.AutoCloseableRequestExecutor;
+import co.paralleluniverse.comsat.bench.http.loadgen.LoadGeneratorBase;
 import co.paralleluniverse.fibers.RuntimeExecutionException;
 import co.paralleluniverse.fibers.SuspendExecution;
 import co.paralleluniverse.fibers.okhttp.FiberOkHttpClient;
@@ -59,7 +59,7 @@ public class AutoCloseableOkHttpClientRequestExecutor extends AutoCloseableReque
       throw new RuntimeExecutionException(e);
     }
 
-    ClientBase.validate(validator, ret);
+    LoadGeneratorBase.validate(validator, ret);
 
     return ret;
   }

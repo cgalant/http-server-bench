@@ -65,7 +65,7 @@ public class JettyHandlerAsyncDispatch extends AbstractHandler {
             return;
         }
 
-        HandlerUtils.recordStart();
+        HandlerUtils.reqStart();
         HandlerUtils.handleDelayWithThread();
         {
             br.setHandled(true);
@@ -78,7 +78,7 @@ public class JettyHandlerAsyncDispatch extends AbstractHandler {
                     e.printStackTrace();
                     throw new RuntimeException(e);
                 } finally {
-                    HandlerUtils.recordEnd();
+                    HandlerUtils.reqEnd();
                 }
         };
     }

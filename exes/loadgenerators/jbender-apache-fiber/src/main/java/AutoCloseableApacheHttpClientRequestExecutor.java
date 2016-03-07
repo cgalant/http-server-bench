@@ -1,5 +1,5 @@
-import co.paralleluniverse.comsat.bench.http.client.AutoCloseableRequestExecutor;
-import co.paralleluniverse.comsat.bench.http.client.ClientBase;
+import co.paralleluniverse.comsat.bench.http.loadgen.AutoCloseableRequestExecutor;
+import co.paralleluniverse.comsat.bench.http.loadgen.LoadGeneratorBase;
 import co.paralleluniverse.fibers.SuspendExecution;
 import com.pinterest.jbender.executors.Validator;
 import org.apache.http.client.config.RequestConfig;
@@ -51,7 +51,7 @@ public class AutoCloseableApacheHttpClientRequestExecutor<X extends HttpRequestB
       throw new RuntimeException(e);
     }
 
-    ClientBase.validate(validator, ret);
+    LoadGeneratorBase.validate(validator, ret);
 
     try {
       ret.close();
