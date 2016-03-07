@@ -16,9 +16,9 @@ subprojects {
     dependencies {
         compile "org.slf4j:slf4j-api:$slf4jApiVer"
 
-        compile "net.sf.jopt-simple:jopt-simple:4.9"
+        compile "net.sf.jopt-simple:jopt-simple:$joptVer"
 
-        capsule "co.paralleluniverse:capsule:$capsuleVersion"
+        capsule "co.paralleluniverse:capsule:$capsuleVer"
     }
 
     task fatCapsule(type: Jar, dependsOn: jar) {
