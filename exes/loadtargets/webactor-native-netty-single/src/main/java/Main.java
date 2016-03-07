@@ -8,17 +8,11 @@ import co.paralleluniverse.comsat.webactors.WebMessage;
 import co.paralleluniverse.comsat.webactors.netty.WebActorHandler;
 import co.paralleluniverse.embedded.containers.AbstractEmbeddedServer;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 
 public final class Main extends LoadTargetBase {
     public static void main(String[] args) throws Exception {
         new Main().run(args);
-    }
-
-    @Override
-    protected int getDefaultPort() {
-        return 8020;
     }
 
     @Override

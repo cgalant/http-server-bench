@@ -1,6 +1,6 @@
 Build all with `gradle fatCapsule`.
 
-Load generator env vars (fill properly):
+Load generator env vars (fill):
 
 ``` bash
 # LOADGEN SYSTEM
@@ -8,48 +8,44 @@ Load generator env vars (fill properly):
 export JVMARGS="-server -XX:+AggressiveOpts -XX:+DisableExplicitGC -XX:+HeapDumpOnOutOfMemoryError -Xms12G -Xmx12G -XX:+UseG1GC -XX:MaxGCPauseMillis=10"
 
 export SERVER=x.x.x.x
+export PORT=8000
 ```
 
-Script snippet for runs (edit and repeat property):
+Script snippet for runs (comment/uncomment and repeat):
 
 ``` bash
-export SERVER_TECH=jetty-handler-async-dispatch ; export PORT=8000
-# export SERVER_TECH=jetty-handler-async-timer-complete ; export PORT=8001
-# export SERVER_TECH=jetty-handler-sync ; export PORT=8002
+export SERVER_TECH=jetty-handler-async-dispatch
+# export SERVER_TECH=jetty-handler-async-queue
 
-# export SERVER_TECH=servlet-async-dispatch-jetty ; export PORT=8003
-# export SERVER_TECH=servlet-async-dispatch-tomcat ; export PORT=8004
-# export SERVER_TECH=servlet-async-dispatch-undertow ; export PORT=8005
+# export SERVER_TECH=jetty-handler-sync
 
-# export SERVER_TECH=servlet-async-fjp-complete-jetty ; export PORT=8006
-# export SERVER_TECH=servlet-async-fjp-complete-tomcat ; export PORT=8007
-# export SERVER_TECH=servlet-async-fjp-complete-undertow ; export PORT=8008
+# export SERVER_TECH=servlet-async-dispatch-jetty
+# export SERVER_TECH=servlet-async-dispatch-tomcat
+# export SERVER_TECH=servlet-async-dispatch-undertow
 
-# export SERVER_TECH=servlet-sync-comsat-jetty ; export PORT=8009
-# export SERVER_TECH=servlet-sync-comsat-tomcat ; export PORT=8010
-# export SERVER_TECH=servlet-sync-comsat-undertow ; export PORT=8011
+# export SERVER_TECH=servlet-async-fjp-jetty
+# export SERVER_TECH=servlet-async-fjp-tomcat
+# export SERVER_TECH=servlet-async-fjp-undertow
 
-# export SERVER_TECH=servlet-sync-jetty ; export PORT=8012
-# export SERVER_TECH=servlet-sync-tomcat ; export PORT=8013
-# export SERVER_TECH=servlet-sync-undertow ; export PORT=8014
+# export SERVER_TECH=servlet-sync-comsat-jetty
+# export SERVER_TECH=servlet-sync-comsat-tomcat
+# export SERVER_TECH=servlet-sync-comsat-undertow
 
-# export SERVER_TECH=spark-handler-sync-simple ; export PORT=8015
+# export SERVER_TECH=servlet-sync-jetty
+# export SERVER_TECH=servlet-sync-tomcat
+# export SERVER_TECH=servlet-sync-undertow
 
-# export SERVER_TECH=undertow-handler-async-same-thread ; export PORT=8016
-# export SERVER_TECH=undertow-handler-async-same-thread-queue ; export PORT=8017
+# export SERVER_TECH=spark-handler-sync
 
-# export SERVER_TECH=undertow-handler-sync-simple ; export PORT=8018
-# export SERVER_TECH=undertow-handler-sync-techempower ; export PORT=8019
+# export SERVER_TECH=undertow-handler-async-dispatch
+# export SERVER_TECH=undertow-handler-async-queue
 
-# export SERVER_TECH=webactor-native-netty-single ; export PORT=8020
-# export SERVER_TECH=webactor-native-netty-multiple ; export PORT=8022
+# export SERVER_TECH=undertow-handler-sync
 
-# export SERVER_TECH=webactor-native-undertow-single ; export PORT=8021
-# export SERVER_TECH=webactor-native-undertow-multiple ; export PORT=8023
+# export SERVER_TECH=webactor-native-netty-single
+# export SERVER_TECH=webactor-native-netty-per-session
 
-# export SERVER_TECH=webactor-servlet-per-session-jetty ; export PORT=8024
-# export SERVER_TECH=webactor-servlet-per-session-tomcat ; export PORT=8025
-# export SERVER_TECH=webactor-servlet-per-session-undertow ; export PORT=8026
+
 
 # PER TECH
 

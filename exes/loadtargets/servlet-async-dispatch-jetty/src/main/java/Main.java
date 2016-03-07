@@ -9,11 +9,6 @@ public final class Main extends JettyLoadTargetBase {
     }
 
     @Override
-    protected final int getDefaultPort() {
-        return 8003;
-    }
-
-    @Override
     protected final Server getJettyServer(int port, int backlog, int maxIOP) throws Exception {
         return Jetty.singleServletServer(port, backlog, maxIOP, new ServletAsyncDispatch(), true);
     }

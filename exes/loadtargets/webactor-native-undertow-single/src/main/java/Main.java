@@ -1,20 +1,15 @@
 import co.paralleluniverse.actors.Actor;
 import co.paralleluniverse.actors.ActorRef;
-import co.paralleluniverse.comsat.bench.http.server.UndertowLoadTargetBase;
+import co.paralleluniverse.comsat.bench.http.server.UndertowAsyncLoadTargetBase;
 import co.paralleluniverse.comsat.bench.http.server.handlers.comsat.webactors.HelloWebActorOne;
 import co.paralleluniverse.comsat.bench.http.server.standalone.Undertow;
 import co.paralleluniverse.comsat.webactors.WebMessage;
 import co.paralleluniverse.comsat.webactors.undertow.WebActorHandler;
 import io.undertow.server.HttpServerExchange;
 
-public final class Main extends UndertowLoadTargetBase {
+public final class Main extends UndertowAsyncLoadTargetBase {
     public static void main(String[] args) throws Exception {
         new Main().run(args);
-    }
-
-    @Override
-    protected final int getDefaultPort() {
-        return 8021;
     }
 
     @Override

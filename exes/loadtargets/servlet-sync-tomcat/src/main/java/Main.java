@@ -8,11 +8,6 @@ public final class Main extends TomcatLoadTargetBase {
     }
 
     @Override
-    protected final int getDefaultPort() {
-        return 8013;
-    }
-
-    @Override
     protected final org.apache.catalina.startup.Tomcat getTomcatServer(int port, int backlog, int maxIOP, String contextRoot) throws Exception {
         return Tomcat.singleServletServer(port, backlog, maxIOP, ServletSync.class.getName(), contextRoot, false);
     }

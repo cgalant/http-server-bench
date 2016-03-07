@@ -8,11 +8,6 @@ public final class Main extends UndertowLoadTargetBase {
     }
 
     @Override
-    protected final int getDefaultPort() {
-        return 8014;
-    }
-
-    @Override
     protected final io.undertow.Undertow getUndertowServer(int port, int backlog, int maxIOP, int maxProcessingP) throws Exception {
         return Undertow.singleServletServer(port, backlog, maxIOP, maxProcessingP, ServletSync.class, true);
     }

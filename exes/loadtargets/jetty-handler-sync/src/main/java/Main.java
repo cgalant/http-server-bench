@@ -9,11 +9,6 @@ public final class Main extends JettyLoadTargetBase {
     }
 
     @Override
-    protected final int getDefaultPort() {
-        return 8002;
-    }
-
-    @Override
     protected final Server getJettyServer(int port, int backlog, int maxIOP) {
         return Jetty.singleHandlerServer(port, backlog, maxIOP, new JettyHandlerSync());
     }

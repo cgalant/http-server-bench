@@ -8,14 +8,16 @@ import joptsimple.OptionSpec;
 import static java.util.Arrays.asList;
 
 public abstract class LoadTargetBase {
-    protected abstract int getDefaultPort();
-
     protected abstract int getDefaultIOParallelism();
 
     protected abstract int getDefaultWorkParallelism();
 
     protected int getDefaultConnectionsBacklog() {
         return 10000;
+    }
+
+    protected final int getDefaultPort() {
+        return 8000;
     }
 
     protected abstract void start(int port, int backlog, int maxIOP, int maxProcessingP) throws Exception;
