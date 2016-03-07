@@ -115,7 +115,7 @@ public final class Monitoring {
             totalGCs = ret.totalGCs = totalGarbageCollections;
             totalGCTimeMS = ret.totalGCTimeMS = totalGarbageCollectionTime;
             ret.avgGCTimeMS = Math.round(totalGarbageCollectionTime / totalGarbageCollections * 100.D) / 100.D;
-            if (totalGCsBak < ret.totalGCs + 1)
+            if (totalGCsBak < ret.totalGCs + 1 && totalGCsBak != 0)
                 missedGCs = true;
             if (!missedGCs) {
                 long lastGCTime = totalGCTimeMS - totalGCTimeMSBak;
