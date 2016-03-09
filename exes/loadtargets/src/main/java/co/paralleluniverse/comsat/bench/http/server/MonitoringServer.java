@@ -139,7 +139,9 @@ public class MonitoringServer extends Application<Configuration> {
                         "\t\t- Avg: " + hs.avgConcurrency + "\n" +
                         "\t\t- Max: " + hs.maxConcurrency + "\n" +
                         (doSysMon ?
-                            "* System stats:" +
+                            "* System stats:\n" +
+                                "\t- Avg OS load: " + ss.avgOSLoad + "\n" +
+                                "\t- Total compilation time (ms): " + ss.totalCompilationTime + "\n" +
                                 "\t- CPU:" + "\n" +
                                 "\t\t- Now: " + ss.cpu + "\n" +
                                 "\t\t- Avg: " + ss.avgCpu + "\n" +
@@ -150,26 +152,20 @@ public class MonitoringServer extends Application<Configuration> {
                                 "\t\t- Max: " + ss.maxThreads + "\n" +
                                 "\t- Daemon threads:" + "\n" +
                                 "\t\t- Now: " + ss.daemonThreads + "\n" +
-                                "\t\t- Avg: " + ss.daemonThreads + "\n" +
-                                "\t\t- Max: " + ss.daemonThreads + "\n" +
-                                "\t- Total mem (MB):" + "\n" +
-                                "\t\t- Now: " + ss.memMB + "\n" +
-                                "\t\t- Avg: " + ss.avgMemMB + "\n" +
-                                "\t\t- Max: " + ss.maxMemMB + "\n" +
-                                "\t- Heap mem (MB):" + "\n" +
-                                "\t\t- Now: " + ss.heapMemMB + "\n" +
-                                "\t\t- Avg: " + ss.avgHeapMemMB + "\n" +
-                                "\t\t- Max: " + ss.maxHeapMemMB + "\n" +
-                                "\t- Non-heap mem (MB):" + "\n" +
-                                "\t\t- Now: " + ss.nonHeapMemMB + "\n" +
-                                "\t\t- Avg: " + ss.avgNonHeapMemMB + "\n" +
-                                "\t\t- Max: " + ss.maxNonHeapMemMB + "\n" +
+                                "\t\t- Avg: " + ss.avgDaemonThreads + "\n" +
+                                "\t\t- Max: " + ss.maxDaemonThreads + "\n" +
+                                "\t- Heap mem:" + "\n" +
+                                "\t\t- Now: " + ss.heapMem + "\n" +
+                                "\t\t- Avg: " + ss.avgHeapMem + "\n" +
+                                "\t\t- Max: " + ss.maxHeapMem + "\n" +
+                                "\t- Non-heap mem:" + "\n" +
+                                "\t\t- Now: " + ss.nonHeapMem + "\n" +
+                                "\t\t- Avg: " + ss.avgNonHeapMem + "\n" +
+                                "\t\t- Max: " + ss.maxNonHeapMem + "\n" +
                                 "\t- GCs:" + "\n" +
                                 "\t\t- Count: " + ss.totalGCs + "\n" +
-                                "\t\t- Avg: " + ss.avgNonHeapMemMB + "\n" +
-                                "\t\t- Max: " + ss.maxGCTimeMS.map(l -> Long.toString(l)).orElse("N/A") + "\n" +
-                                "\t- Avg OS load: " + ss.avgOSLoad + "\n" +
-                                "\t- Total compilation time (ms): " + ss.totalCompilationTime + "\n"
+                                "\t\t- Avg: " + ss.avgGCTimeMS + "\n" +
+                                "\t\t- Max: " + ss.maxGCTimeMS + (ss.missedGCs ? " (WARN: missed GCs)" : "") + "\n"
                             : "") + "\n"
                 );
             }
