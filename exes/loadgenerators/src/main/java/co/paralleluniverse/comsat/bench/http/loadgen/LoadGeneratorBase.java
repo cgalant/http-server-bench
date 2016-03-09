@@ -3,7 +3,10 @@ package co.paralleluniverse.comsat.bench.http.loadgen;
 import co.paralleluniverse.fibers.DefaultFiberScheduler;
 import co.paralleluniverse.fibers.Fiber;
 import co.paralleluniverse.fibers.SuspendExecution;
+import co.paralleluniverse.strands.Strand;
 import co.paralleluniverse.strands.StrandFactory;
+import co.paralleluniverse.strands.SuspendableCallable;
+import co.paralleluniverse.strands.SuspendableRunnable;
 import co.paralleluniverse.strands.channels.Channel;
 import co.paralleluniverse.strands.channels.Channels;
 import com.pinterest.jbender.JBender;
@@ -25,7 +28,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -51,7 +53,7 @@ public abstract class LoadGeneratorBase<Req, Res, Exec extends AutoCloseableRequ
 
     protected abstract E setupEnv(OptionSet options);
 
-    final public void run(final String[] args, final StrandFactory sf) throws SuspendExecution, InterruptedException, ExecutionException, IOException {
+    public final void run(final String[] args, final StrandFactory sf) throws SuspendExecution, InterruptedException, ExecutionException, IOException {
         final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         if (logger instanceof ch.qos.logback.classic.Logger) {
             ch.qos.logback.classic.Logger logbackLogger = (ch.qos.logback.classic.Logger) logger;
@@ -59,6 +61,7 @@ public abstract class LoadGeneratorBase<Req, Res, Exec extends AutoCloseableRequ
         }
 
         final OptionParser parser = new OptionParser();
+        final OptionSpec<Integer> j = parser.acceptsAll(asList("j", "repetitions")).withOptionalArg().ofType(Integer.class).describedAs("The number of benchmark repetitions").defaultsTo(1);
         final OptionSpec<Integer> r = parser.acceptsAll(asList("r", "rate")).withOptionalArg().ofType(Integer.class).describedAs("The desired throughput, in requests per second");
         final OptionSpec<Integer> v = parser.acceptsAll(asList("v", "interval")).withOptionalArg().ofType(Integer.class).describedAs("The interval between requests, in nanoseconds");
         final OptionSpec<Integer> n = parser.acceptsAll(asList("n", "maxConcurrency")).withOptionalArg().ofType(Integer.class).describedAs("Maximum concurrency level");
@@ -109,7 +112,8 @@ public abstract class LoadGeneratorBase<Req, Res, Exec extends AutoCloseableRequ
         final int ebsV = options.valueOf(ebs) < 0 ? reqs : options.valueOf(ebs);
 
         System.err.println(
-            "\n=============== JBENDER SETTINGS ==============\n" +
+            "\n=============== LOAD GENERATOR SETTINGS ==============\n" +
+                "\t* Repetitions (-j): " + options.valueOf(j) + "\n" +
                 "\t* HTTP URL (-u): GET " + options.valueOf(u) + "\n" +
                 "\t* Monitor control base HTTP URL (-z): " + options.valueOf(z) + "\n" +
                 "\t" +
@@ -140,23 +144,146 @@ public abstract class LoadGeneratorBase<Req, Res, Exec extends AutoCloseableRequ
                 "\t\t- Generated requests (-rbs, equals count if pre-generating): " + rbsV + "\n" +
                 "\t\t- Request completion events (-ebs): " + ebsV + "\n" +
                 "\t* Pre-generate requests (-p): " + options.has(P) + "\n" +
-                "\t* Logging (-l): " + options.has("l") + "\n"
+                "\t* Logging (-l): " + options.has("l") +
+            "\n======================================================\n"
         );
 
         env = setupEnv(options);
-        try (final Exec requestExecutor =
-                 env.newRequestExecutor(options.valueOf(i), options.valueOf(m), options.valueOf(t), options.valueOf(k))) {
+        final int runs = options.valueOf(j);
+        Histogram histogram;
+        Date start;
+        ProgressLogger<Res, Exec> resExecProgressLogger;
+        for (int jj = 0 ; jj < runs ; jj++) {
+            System.err.println("======================= (" + (jj + 1) + "/" + runs + ") ========================");
 
-            final int warms = options.valueOf(w);
-            final int recordedReqs = reqs - warms;
-            final Channel<Req> requestCh = Channels.newChannel(options.has(P) ? reqs : rbsV);
-            final Channel<TimingEvent<Res>> eventCh = Channels.newChannel(ebsV);
+            histogram = new Histogram(options.valueOf(x), options.valueOf(d));
+            try (final Exec requestExecutor =
+                     env.newRequestExecutor(options.valueOf(i), options.valueOf(m), options.valueOf(t), options.valueOf(k))) {
 
-            final String uri = options.valueOf(u);
+                final int warms = options.valueOf(w);
+                final int recordedReqs = reqs - warms;
+                final Channel<Req> requestCh = Channels.newChannel(options.has(P) ? reqs : rbsV);
+                final Channel<TimingEvent<Res>> eventCh = Channels.newChannel(ebsV);
 
-            // Requests generator
-            final Fiber<Void> reqGen = new Fiber<Void>("req-gen", () -> {
-                for (int j = 0; j < reqs; ++j) {
+                final String url = options.valueOf(u);
+                final String monitoringURL = options.valueOf(z);
+                final Fiber<Void> reqGen = startReqGen(reqs, requestCh, url);
+
+                if (options.has(P))
+                    reqGen.join();
+
+                restartMonitoring(monitoringURL, monitoringURL + "/start?sampleIntervalMS=" + options.valueOf(smsi) + "&printIntervalMS=" + options.valueOf(smpi) + "&sysMon=" + options.has(SMSY));
+
+                // Event recording, both HistHDR and logging
+                resExecProgressLogger = new ProgressLogger<>(requestExecutor, recordedReqs, options.valueOf(cmpi));
+                final HdrHistogramRecorder hdrHistogramRecorder = new HdrHistogramRecorder(histogram, 1);
+                final Fiber recorder;
+                if (options.has("l"))
+                    recorder = record(eventCh, hdrHistogramRecorder, new LoggingRecorder(LOG), resExecProgressLogger);
+                else
+                    recorder = record(eventCh, hdrHistogramRecorder, resExecProgressLogger);
+
+                final Fiber<Void> jbender = startJBender(sf, r, v, n, options, requestExecutor, warms, requestCh, eventCh);
+                start = new Date(); // Real start
+
+                if (!options.has(P))
+                    reqGen.join();
+
+                jbender.join();
+
+                System.err.println("Terminating iteration");
+                new Fiber() {
+                    @Override
+                    public Object run() throws InterruptedException, SuspendExecution {
+                        for (int i1 = 0 ; i1<100 ; i1++) {
+                            Strand.sleep(100L);
+                            System.err.print('.');
+                        }
+                        return null;
+                    }
+                }.start().join();
+                recorder.join();
+
+                System.err.println("\n======================================================");
+
+                if (resExecProgressLogger != null) {
+                    System.err.println("Stopping progress logging...");
+                    resExecProgressLogger.stopProgressLog();
+                }
+                System.err.println("Stopping server monitoring...");
+                // Stop server monitoring
+                try {
+                    simpleBlockingGET(options.valueOf(z) + "/stop");
+                } catch (final IOException e1) {
+                    System.err.println("WARNING: couldn't stop monitoring (exception follows)");
+                    e1.printStackTrace(System.err);
+                }
+
+                // More stats
+                final Date now = new Date();
+                System.err.println("[" + fmt(now) + "] Run stats:");
+                histogram.outputPercentileDistribution(System.err, options.valueOf(s));
+                System.err.println();
+                System.err.println("* Load started: " + dateFormat.format(start));
+                if (resExecProgressLogger != null) {
+                    System.err.println("* Successful requests: " + resExecProgressLogger.succ.get());
+                    System.err.println("* Failed requests: " + resExecProgressLogger.err.get());
+                    final Date firstReqEnd = resExecProgressLogger.start.get();
+                    System.err.println("* First request ended: " + dateFormat.format(firstReqEnd));
+                    final Date lastReqEnd = resExecProgressLogger.end.get();
+                    System.err.println("* Last request ended: " + dateFormat.format(lastReqEnd));
+                    System.err.println("* Seconds from load start: " + ((lastReqEnd.getTime() - start.getTime()) / 1_000.0D));
+                    System.err.println("* Seconds from first request completed: " + ((lastReqEnd.getTime() - firstReqEnd.getTime()) / 1_000.0D) + "\n");
+                } else {
+                    System.err.println("WARN: progress logger didn't start, no further stats available");
+                }
+            } catch (final Throwable e) {
+                System.err.println("WARNING: repetition aborted (exception follows)");
+                e.printStackTrace(System.err);
+            }
+        }
+
+        System.err.println("Shutting down");
+        e.shutdown();
+    }
+
+    private void restartMonitoring(String baseMonitoringURL, String startMonitoringURL) throws IOException {
+        // Reset and start server monitoring
+        simpleBlockingGET(baseMonitoringURL + "/reset");
+        simpleBlockingGET(startMonitoringURL);
+    }
+
+    private Fiber<Void> startJBender(final StrandFactory sf, final OptionSpec<Integer> r, final OptionSpec<Integer> v, final OptionSpec<Integer> n, final OptionSet options, final Exec requestExecutor, final int warms, final Channel<Req> requestCh, final Channel<TimingEvent<Res>> eventCh) {
+        //noinspection Convert2Lambda
+        return new Fiber<>("jbender", new SuspendableCallable<Void>() {
+            @Override
+            public Void run() throws SuspendExecution, InterruptedException {
+                if (options.has(n)) {
+                    System.err.println("================== CONCURRENCY TEST ==================");
+                    JBender.loadTestConcurrency(options.valueOf(n), warms, requestCh, requestExecutor, eventCh, sf);
+                } else {
+                    System.err.println("===================== RATE TEST ======================");
+                    IntervalGenerator intervalGen = null;
+
+                    if (options.has(r))
+                        intervalGen = new ExponentialIntervalGenerator(options.valueOf(r));
+                    else if (options.has(v))
+                        intervalGen = new ConstantIntervalGenerator(options.valueOf(v));
+
+                    JBender.loadTestThroughput(intervalGen, warms, requestCh, requestExecutor, eventCh, sf);
+                }
+                return null;
+            }
+        }).start();
+    }
+
+    private Fiber<Void> startReqGen(final int reqs, final Channel<Req> requestCh, final String uri) {
+        // Requests generator
+        //noinspection Convert2Lambda
+        return new Fiber<Void>("req-gen", new SuspendableRunnable() {
+            @Override
+            public void run() throws SuspendExecution, InterruptedException {
+                for (int ii = 0; ii < reqs; ++ii) {
                     final Req req;
                     try {
                         req = env.newRequest(uri);
@@ -167,86 +294,8 @@ public abstract class LoadGeneratorBase<Req, Res, Exec extends AutoCloseableRequ
                 }
 
                 requestCh.close();
-            }).start();
-
-            if (options.has(P)) {
-                reqGen.join();
             }
-
-            final Histogram histogram = new Histogram(options.valueOf(x), options.valueOf(d));
-
-            // Event recording, both HistHDR and logging
-            final ProgressLogger<Res, Exec> resExecProgressLogger = new ProgressLogger<>(requestExecutor, recordedReqs, options.valueOf(cmpi));
-            final HdrHistogramRecorder hdrHistogramRecorder = new HdrHistogramRecorder(histogram, 1);
-            final Fiber recorder;
-            if (options.has("l")) {
-                recorder = record(eventCh, hdrHistogramRecorder, new LoggingRecorder(LOG), resExecProgressLogger);
-            } else {
-                recorder = record(eventCh, hdrHistogramRecorder, resExecProgressLogger);
-            }
-
-            // Reset and start server monitoring
-            simpleBlockingGET(options.valueOf(z) + "/reset");
-            simpleBlockingGET(options.valueOf(z) + "/start?sampleIntervalMS=" + options.valueOf(smsi) + "&printIntervalMS=" + options.valueOf(smpi) + "&sysMon=" + options.has(SMSY));
-
-            // Main
-            final Fiber<Void> jbender = new Fiber<>("jbender", () -> {
-                if (options.has(n)) {
-                    System.err.println("=============== CONCURRENCY TEST ==============");
-                    JBender.loadTestConcurrency(options.valueOf(n), warms, requestCh, requestExecutor, eventCh, sf);
-                } else {
-                    System.err.println("================== RATE TEST ==================");
-                    IntervalGenerator intervalGen = null;
-
-                    if (options.has(r))
-                        intervalGen = new ExponentialIntervalGenerator(options.valueOf(r));
-                    else if (options.has(v))
-                        intervalGen = new ConstantIntervalGenerator(options.valueOf(v));
-
-                    JBender.loadTestThroughput(intervalGen, warms, requestCh, requestExecutor, eventCh, sf);
-                }
-            });
-            jbender.start();
-
-            // More stats
-            final Date start = new Date();
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                System.err.println("Shutting down");
-                System.err.println("Stopping progress logging");
-                resExecProgressLogger.stopProgressLog();
-                System.err.println("Stopping server monitoring");
-                // Stop server monitoring
-                try {
-                    simpleBlockingGET(options.valueOf(z) + "/stop");
-                } catch (final IOException ignored) {
-                }
-
-                final Date now = new Date();
-                System.err.println("[" + fmt(now) + "] Final stats:");
-                histogram.outputPercentileDistribution(System.err, options.valueOf(s));
-                System.err.println("\n* Successful requests: " + resExecProgressLogger.succ.get());
-                System.err.println("* Failed requests: " + resExecProgressLogger.err.get());
-                System.err.println("* Load started: " + dateFormat.format(start));
-                final Date firstReqEnd = resExecProgressLogger.start.get();
-                System.err.println("* First request ended: " + dateFormat.format(firstReqEnd));
-                final Date lastReqEnd = resExecProgressLogger.end.get();
-                System.err.println("* Last request ended: " + dateFormat.format(lastReqEnd));
-                System.err.println("* Seconds from load start: " + ((lastReqEnd.getTime() - start.getTime()) / 1_000.0D));
-                System.err.println("* Seconds from first request completed: " + ((lastReqEnd.getTime() - firstReqEnd.getTime()) / 1_000.0D) + "\n");
-            }));
-
-            jbender.join();
-
-            // Stop server monitoring
-            simpleBlockingGET(options.valueOf(z) + "/stop");
-
-            recorder.join();
-
-            e.shutdown();
-        } catch (final Throwable e) {
-            System.err.println("Got exception: " + e.getMessage());
-            System.err.println(Arrays.toString(e.getStackTrace()));
-        }
+        }).start();
     }
 
     public static <X> void validate(Validator<X> validator, X v) {

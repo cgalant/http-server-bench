@@ -41,26 +41,25 @@ final class ProgressLogger<Res, Exec extends AutoCloseableRequestExecutor<?, Res
           final long succeeded = succ.get();
           final long errored = err.get();
 
-          if (succeeded + errored == total) {
+          final long end = System.nanoTime();
+
+          final long finished = succeeded + errored;
+          final long finishedRoundedPercent = (long) Math.floor(((double) (succeeded + errored)) / ((double) total) * 100.0D);
+
+          // Notify progress
+          final long newFinished = finished - notified;
+          final long newTimeNanos = end - notifiedNanos;
+          notified = finished;
+          notifiedNanos = end;
+
+          final double succeededPercent = Math.round(((double) (succeeded)) / ((double) total) * 100.0D * 100.D) / 100.D;
+          final double erroredPercent = Math.round(((double) (errored)) / ((double) total) * 100.0D * 100.D) / 100.D;
+          final String avgRPSStr = avgDurationNanos > 0 ? Double.toString(1.0D / (avgDurationNanos) * 1_000_000_000_000L) : "N/A";
+
+          log.info((succeeded + errored) + "/" + finishedRoundedPercent + "% (" + succeeded + "/" + succeededPercent + "% OK + " + errored + "/" + erroredPercent + "% KO) / " + total + " (+" + newFinished + " reqs in " + newTimeNanos + " nanos, " + avgRPSStr + " avg rps, concurrency = " + requestExecutor.getCurrentConcurrency() + ", max = " + requestExecutor.getMaxConcurrency() + ")");
+
+          if (succeeded + errored == total)
             tp.cancel();
-          } else {
-            final long end = System.nanoTime();
-
-            final long finished = succeeded + errored;
-            final long finishedRoundedPercent = (long) Math.floor(((double) (succeeded + errored)) / ((double) total) * 100.0D);
-
-            // Notify progress
-            final long newFinished = finished - notified;
-            final long newTimeNanos = end - notifiedNanos;
-            notified = finished;
-            notifiedNanos = end;
-
-            final double succeededPercent = Math.round(((double) (succeeded)) / ((double) total) * 100.0D * 100.D) / 100.D;
-            final double erroredPercent = Math.round(((double) (errored)) / ((double) total) * 100.0D * 100.D) / 100.D;
-            final String avgRPSStr = avgDurationNanos > 0 ? Double.toString(1.0D / (avgDurationNanos) * 1_000_000_000_000L) : "N/A";
-
-            log.info((succeeded + errored) + "/" + finishedRoundedPercent + "% (" + succeeded + "/" + succeededPercent + "% OK + " + errored + "/" + erroredPercent + "% KO) / " + total + " (+" + newFinished + " reqs in " + newTimeNanos + " nanos, " + avgRPSStr + " avg rps, concurrency = " + requestExecutor.getCurrentConcurrency() + ", max = " + requestExecutor.getMaxConcurrency() + ")");
-          }
         }
       },
       cmpi,
