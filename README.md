@@ -74,10 +74,10 @@ tail -f ${SERVER_TECH}.${BENCH_NAME}.slog # CTRL-C
 
 # LOADGEN: rate1k1000ms warmup
 export CLIENT_TECH=jbender-okhttp-fiber
-java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar $CLIENT_TECH/build/libs/${CLIENT_TECH}-fatcap.jar -u http://${SERVER}:${PORT}/hello -c 100000 -n 1000 -w 0 -cmpi 250
+java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar $CLIENT_TECH/build/libs/${CLIENT_TECH}-fatcap.jar -u http://${SERVER}:${PORT}/hello -z http://${SERVER}:9000/monitor -smsy -c 100000 -n 1000 -w 0 -cmpi 250
 # rate1k1000ms
 export CLIENT_TECH=jbender-apache-fiber
-java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar $CLIENT_TECH/build/libs/${CLIENT_TECH}-fatcap.jar -u http://${SERVER}:${PORT}/hello -z http://${SERVER}:9000/monitor -smsy -c 100000 -r 1000 -cmpi 250 -w 0 -j 3 >> ${SERVER_TECH}.rate1k1000ms.clog 2>&1 &
+java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar $CLIENT_TECH/build/libs/${CLIENT_TECH}-fatcap.jar -u http://${SERVER}:${PORT}/hello -z http://${SERVER}:9000/monitor -smsy -c 100000 -r 1000 -cmpi 250 -w 0 -j 10 >> ${SERVER_TECH}.rate1k1000ms.clog 2>&1 &
 tail -f ${SERVER_TECH}.rate1k1000ms.clog # CTRL-C
 
 
@@ -91,10 +91,10 @@ tail -f ${SERVER_TECH}.${BENCH_NAME}.slog # CTRL-C
 
 # LOADGEN: rate10k100ms warmup
 export CLIENT_TECH=jbender-okhttp-fiber
-java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar $CLIENT_TECH/build/libs/${CLIENT_TECH}-fatcap.jar -u http://${SERVER}:${PORT}/hello -c 100000 -n 1000 -w 0 -cmpi 250
+java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar $CLIENT_TECH/build/libs/${CLIENT_TECH}-fatcap.jar -u http://${SERVER}:${PORT}/hello -z http://${SERVER}:9000/monitor -smsy -c 100000 -n 1000 -w 0 -cmpi 250
 # rate10k100ms
 export CLIENT_TECH=jbender-okhttp-fiber
-java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar $CLIENT_TECH/build/libs/${CLIENT_TECH}-fatcap.jar -u http://${SERVER}:${PORT}/hello -z http://${SERVER}:9000/monitor -smsy -c 100000 -r 10000 -cmpi 250 -w 0 -j 3 >> ${SERVER_TECH}.rate10k100ms.clog 2>&1 &
+java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar $CLIENT_TECH/build/libs/${CLIENT_TECH}-fatcap.jar -u http://${SERVER}:${PORT}/hello -z http://${SERVER}:9000/monitor -smsy -c 100000 -r 10000 -cmpi 250 -w 0 -j 10 >> ${SERVER_TECH}.rate10k100ms.clog 2>&1 &
 tail -f ${SERVER_TECH}.rate10k100ms.clog # CTRL-C
 
 
@@ -108,9 +108,9 @@ tail -f ${SERVER_TECH}.${BENCH_NAME}.slog # CTRL-C
 
 # LOADGEN: rate100k0ms warmup
 export CLIENT_TECH=jbender-okhttp-fiber
-java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar $CLIENT_TECH/build/libs/${CLIENT_TECH}-fatcap.jar -u http://${SERVER}:${PORT}/hello -c 100000 -n 1000 -w 0 -cmpi 250
+java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar $CLIENT_TECH/build/libs/${CLIENT_TECH}-fatcap.jar -u http://${SERVER}:${PORT}/hello -z http://${SERVER}:9000/monitor -smsy -c 100000 -n 1000 -w 0 -cmpi 250
 # rate100k0ms
 export CLIENT_TECH=jbender-okhttp-fiber
-java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar $CLIENT_TECH/build/libs/${CLIENT_TECH}-fatcap.jar -u http://${SERVER}:${PORT}/hello -z http://${SERVER}:9000/monitor -smsy -c 100000 -r 100000 -cmpi 250 -w 0 -j 3 >> ${SERVER_TECH}.rate100k0ms.clog 2>&1 &
+java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar $CLIENT_TECH/build/libs/${CLIENT_TECH}-fatcap.jar -u http://${SERVER}:${PORT}/hello -z http://${SERVER}:9000/monitor -smsy -c 100000 -r 100000 -cmpi 250 -w 0 -j 10 >> ${SERVER_TECH}.rate100k0ms.clog 2>&1 &
 tail -f ${SERVER_TECH}.rate100k0ms.clog # CTRL-C
 ```
