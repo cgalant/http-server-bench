@@ -14,6 +14,8 @@ export PORT=8000
 Script snippet for runs (comment/uncomment and repeat):
 
 ``` bash
+export JVMARGS="-Dco.paralleluniverse.fibers.detectRunawayFibers=false -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncExceptions=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncForward=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableJettyAsyncFixes=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableTomcatAsyncFixes=true -server -XX:+AggressiveOpts -XX:+DisableExplicitGC -XX:+HeapDumpOnOutOfMemoryError -Xms4G -Xmx4G"
+
 export SERVER_TECH=jetty-handler-async-dispatch
 # export SERVER_TECH=jetty-handler-async-queue
 
@@ -54,21 +56,18 @@ export SERVER_TECH=jetty-handler-async-dispatch
 export DELAY=3600000
 export BENCH_NAME=concurrency
 # export JVMARGS="-agentlib:jdwp=transport=dt_socket,address=localhost:5005,server=y,suspend=y -Dco.paralleluniverse.fibers.detectRunawayFibers=false -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncExceptions=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncForward=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableJettyAsyncFixes=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableTomcatAsyncFixes=true -server -XX:+AggressiveOpts -XX:+DisableExplicitGC -XX:+HeapDumpOnOutOfMemoryError -Xms4G -Xmx4G -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true,dumponexitpath=${SERVER_TECH}.${BENCH_NAME}.jfr"
-export JVMARGS="-Dco.paralleluniverse.fibers.detectRunawayFibers=false -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncExceptions=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncForward=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableJettyAsyncFixes=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableTomcatAsyncFixes=true -server -XX:+AggressiveOpts -XX:+DisableExplicitGC -XX:+HeapDumpOnOutOfMemoryError -Xms4G -Xmx4G -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true,dumponexitpath=${SERVER_TECH}.${BENCH_NAME}.jfr"
 java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar ${SERVER_TECH}/build/libs/${SERVER_TECH}-fatcap.jar -d ${DELAY} -c monitoring-server-conf.yml >> ${SERVER_TECH}.${BENCH_NAME}.slog 2>&1 &
 tail -f ${SERVER_TECH}.${BENCH_NAME}.slog # CTRL-C
 
 # LOADGEN: concurrency
 export CLIENT_TECH=jbender-apache-fiber
-java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar $CLIENT_TECH/build/libs/${CLIENT_TECH}-fatcap.jar -u http://${SERVER}:${PORT}/hello -z http://${SERVER}:9000/monitor -smsy -c 54000 -n 54000 -rbs 1 -ebs 1 -cmpi 250 -w 0 >> ${SERVER_TECH}.concurrency.clog 2>&1 &
-tail -f ${SERVER_TECH}.concurrency.clog # CTRL-C
+java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar $CLIENT_TECH/build/libs/${CLIENT_TECH}-fatcap.jar -u http://${SERVER}:${PORT}/hello -z http://${SERVER}:9000/monitor -smsy -c 54000 -n 54000 -rbs 1 -ebs 1 -cmpi 250 -w 0
 
 
 # LOADTARGET: rate1k1000ms
 export DELAY=1000
 export BENCH_NAME=rate1k1000ms
 # export JVMARGS="-agentlib:jdwp=transport=dt_socket,address=localhost:5005,server=y,suspend=y -Dco.paralleluniverse.fibers.detectRunawayFibers=false -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncExceptions=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncForward=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableJettyAsyncFixes=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableTomcatAsyncFixes=true -server -XX:+AggressiveOpts -XX:+DisableExplicitGC -XX:+HeapDumpOnOutOfMemoryError -Xms4G -Xmx4G -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true,dumponexitpath=${SERVER_TECH}.${BENCH_NAME}.jfr"
-export JVMARGS="-Dco.paralleluniverse.fibers.detectRunawayFibers=false -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncExceptions=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncForward=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableJettyAsyncFixes=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableTomcatAsyncFixes=true -server -XX:+AggressiveOpts -XX:+DisableExplicitGC -XX:+HeapDumpOnOutOfMemoryError -Xms4G -Xmx4G -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true,dumponexitpath=${SERVER_TECH}.${BENCH_NAME}.jfr"
 java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar ${SERVER_TECH}/build/libs/${SERVER_TECH}-fatcap.jar -d ${DELAY} -c monitoring-server-conf.yml >> ${SERVER_TECH}.${BENCH_NAME}.slog 2>&1 &
 tail -f ${SERVER_TECH}.${BENCH_NAME}.slog # CTRL-C
 
@@ -85,7 +84,6 @@ tail -f ${SERVER_TECH}.rate1k1000ms.clog # CTRL-C
 export DELAY=100
 export BENCH_NAME=rate10k100ms
 # export JVMARGS="-agentlib:jdwp=transport=dt_socket,address=localhost:5005,server=y,suspend=y -Dco.paralleluniverse.fibers.detectRunawayFibers=false -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncExceptions=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncForward=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableJettyAsyncFixes=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableTomcatAsyncFixes=true -server -XX:+AggressiveOpts -XX:+DisableExplicitGC -XX:+HeapDumpOnOutOfMemoryError -Xms4G -Xmx4G -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true,dumponexitpath=${SERVER_TECH}.${BENCH_NAME}.jfr"
-export JVMARGS="-Dco.paralleluniverse.fibers.detectRunawayFibers=false -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncExceptions=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncForward=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableJettyAsyncFixes=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableTomcatAsyncFixes=true -server -XX:+AggressiveOpts -XX:+DisableExplicitGC -XX:+HeapDumpOnOutOfMemoryError -Xms4G -Xmx4G -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true,dumponexitpath=${SERVER_TECH}.${BENCH_NAME}.jfr"
 java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar ${SERVER_TECH}/build/libs/${SERVER_TECH}-fatcap.jar -d ${DELAY} -c monitoring-server-conf.yml >> ${SERVER_TECH}.${BENCH_NAME}.slog 2>&1 &
 tail -f ${SERVER_TECH}.${BENCH_NAME}.slog # CTRL-C
 
@@ -102,7 +100,6 @@ tail -f ${SERVER_TECH}.rate10k100ms.clog # CTRL-C
 export DELAY=0
 export BENCH_NAME=rate100k0ms
 # export JVMARGS="-agentlib:jdwp=transport=dt_socket,address=localhost:5005,server=y,suspend=y -Dco.paralleluniverse.fibers.detectRunawayFibers=false -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncExceptions=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncForward=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableJettyAsyncFixes=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableTomcatAsyncFixes=true -server -XX:+AggressiveOpts -XX:+DisableExplicitGC -XX:+HeapDumpOnOutOfMemoryError -Xms4G -Xmx4G -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true,dumponexitpath=${SERVER_TECH}.${BENCH_NAME}.jfr"
-export JVMARGS="-Dco.paralleluniverse.fibers.detectRunawayFibers=false -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncExceptions=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncForward=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableJettyAsyncFixes=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableTomcatAsyncFixes=true -server -XX:+AggressiveOpts -XX:+DisableExplicitGC -XX:+HeapDumpOnOutOfMemoryError -Xms4G -Xmx4G -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true,dumponexitpath=${SERVER_TECH}.${BENCH_NAME}.jfr"
 java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar ${SERVER_TECH}/build/libs/${SERVER_TECH}-fatcap.jar -d ${DELAY} -c monitoring-server-conf.yml >> ${SERVER_TECH}.${BENCH_NAME}.slog 2>&1 &
 tail -f ${SERVER_TECH}.${BENCH_NAME}.slog # CTRL-C
 
