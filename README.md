@@ -61,7 +61,8 @@ tail -f ${SERVER_TECH}.${BENCH_NAME}.slog # CTRL-C
 
 # LOADGEN: concurrency
 export CLIENT_TECH=jbender-apache-fiber
-java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar $CLIENT_TECH/build/libs/${CLIENT_TECH}-fatcap.jar -u http://${SERVER}:${PORT}/hello -z http://${SERVER}:9000/monitor -smsy -c 54000 -n 54000 -rbs 1 -ebs 1 -cmpi 250 -w 0
+java -Dcapsule.jvm.args=${JVMARGS} -Dcapsule.log=verbose -jar $CLIENT_TECH/build/libs/${CLIENT_TECH}-fatcap.jar -u http://${SERVER}:${PORT}/hello -z http://${SERVER}:9000/monitor -smsy -c 54000 -n 54000 -rbs 1 -ebs 1 -cmpi 250 -w 0 >> ${SERVER_TECH}.concurrency.clog 2>&1 &
+tail -f ${SERVER_TECH}.concurrency.clog # CTRL-C
 
 
 # LOADTARGET: rate1k1000ms
