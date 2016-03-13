@@ -86,6 +86,15 @@ public class MonitoringServer extends Application<Configuration> {
             return true;
         }
 
+        @Path("exit") @GET public boolean exit() {
+            stopMonitoring();
+            new Thread(() -> {
+                System.err.println("Shutdown requested, terminating");
+                System.exit(0);
+            }).start();
+            return true;
+        }
+
         public static void stopMonitoring() {
             if (tp != null) tp.cancel();
             if (ts != null) ts.cancel();

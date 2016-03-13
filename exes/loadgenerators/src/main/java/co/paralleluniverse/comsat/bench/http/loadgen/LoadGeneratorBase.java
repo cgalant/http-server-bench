@@ -32,6 +32,8 @@ import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static co.paralleluniverse.comsat.bench.Utils.fmt;
 
@@ -89,6 +91,8 @@ public abstract class LoadGeneratorBase<Req, Res, Exec extends AutoCloseableRequ
         final OptionSpec<Integer> rbs = parser.accepts("rbs").withRequiredArg().ofType(Integer.class).describedAs("Buffer size for generated requests").defaultsTo(-1);
         final OptionSpec<Integer> ebs = parser.accepts("ebs").withRequiredArg().ofType(Integer.class).describedAs("Buffer size for request completion events").defaultsTo(-1);
 
+        final OptionSpec<Boolean> ss = parser.accepts("ss").withRequiredArg().ofType(Boolean.class).describedAs("Shutdown server after run").defaultsTo(true);
+
         parser.acceptsAll(asList(L, "logging"));
 
         parser.acceptsAll(asList(H, "?", "help"), "Show help").forHelp();
@@ -116,6 +120,7 @@ public abstract class LoadGeneratorBase<Req, Res, Exec extends AutoCloseableRequ
                 "\t* Repetitions (-j): " + options.valueOf(j) + "\n" +
                 "\t* HTTP URL (-u): GET " + options.valueOf(u) + "\n" +
                 "\t* Monitor control base HTTP URL (-z): " + options.valueOf(z) + "\n" +
+                "\t* Shutdown server after run (-ss): " + options.valueOf(ss) + "\n" +
                 "\t" +
                 (!options.has(v) ?
                     (!options.has(r) ?
@@ -150,13 +155,25 @@ public abstract class LoadGeneratorBase<Req, Res, Exec extends AutoCloseableRequ
 
         env = setupEnv(options);
         final int runs = options.valueOf(j);
-        Histogram histogram;
-        Date start;
-        ProgressLogger<Res, Exec> resExecProgressLogger;
+
+        final AtomicReference<Histogram> histogram = new AtomicReference<>(null);
+        final AtomicReference<ProgressLogger<Res, Exec>> resExecProgressLogger = new AtomicReference<>(null);
+        final AtomicReference<Date> start = new AtomicReference<>(null);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (options.valueOf(ss) && !serverShutdown.get()) {
+                try {
+                    System.err.println("Shutting down server");
+                    simpleBlockingGET(options.valueOf(z) + "/exit");
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+            }
+        }));
         for (int jj = 0 ; jj < runs ; jj++) {
             System.err.println("======================= (" + (jj + 1) + "/" + runs + ") ========================");
 
-            histogram = new Histogram(options.valueOf(x), options.valueOf(d));
+            histogram.set(new Histogram(options.valueOf(x), options.valueOf(d)));
             try (final Exec requestExecutor =
                      env.newRequestExecutor(options.valueOf(i), options.valueOf(m), options.valueOf(t), options.valueOf(k))) {
 
@@ -175,16 +192,16 @@ public abstract class LoadGeneratorBase<Req, Res, Exec extends AutoCloseableRequ
                 restartMonitoring(monitoringURL, monitoringURL + "/start?sampleIntervalMS=" + options.valueOf(smsi) + "&printIntervalMS=" + options.valueOf(smpi) + "&sysMon=" + options.has(SMSY));
 
                 // Event recording, both HistHDR and logging
-                resExecProgressLogger = new ProgressLogger<>(requestExecutor, recordedReqs, options.valueOf(cmpi));
-                final HdrHistogramRecorder hdrHistogramRecorder = new HdrHistogramRecorder(histogram, 1);
+                resExecProgressLogger.set(new ProgressLogger<>(requestExecutor, recordedReqs, options.valueOf(cmpi)));
+                HdrHistogramRecorder hdrHistogramRecorder = new HdrHistogramRecorder(histogram.get(), 1);
                 final Fiber recorder;
                 if (options.has("l"))
-                    recorder = record(eventCh, hdrHistogramRecorder, new LoggingRecorder(LOG), resExecProgressLogger);
+                    recorder = record(eventCh, hdrHistogramRecorder, new LoggingRecorder(LOG), resExecProgressLogger.get());
                 else
-                    recorder = record(eventCh, hdrHistogramRecorder, resExecProgressLogger);
+                    recorder = record(eventCh, hdrHistogramRecorder, resExecProgressLogger.get());
 
                 final Fiber<Void> jbender = startJBender(sf, r, v, n, options, requestExecutor, warms, requestCh, eventCh);
-                start = new Date(); // Real start
+                start.set(new Date()); // Real start
 
                 if (!options.has(P))
                     reqGen.join();
@@ -206,10 +223,11 @@ public abstract class LoadGeneratorBase<Req, Res, Exec extends AutoCloseableRequ
 
                 System.err.println("\n======================================================");
 
-                if (resExecProgressLogger != null) {
+                if (resExecProgressLogger.get() != null) {
                     System.err.println("Stopping progress logging...");
-                    resExecProgressLogger.stopProgressLog();
+                    resExecProgressLogger.get().stopProgressLog();
                 }
+
                 System.err.println("Stopping server monitoring...");
                 // Stop server monitoring
                 try {
@@ -243,7 +261,13 @@ public abstract class LoadGeneratorBase<Req, Res, Exec extends AutoCloseableRequ
             }
         }
 
-        System.err.println("Shutting down");
+        if (options.valueOf(ss)) {
+            System.err.println("Shutting down server");
+            simpleBlockingGET(options.valueOf(z) + "/exit");
+            serverShutdown.set(true);
+        }
+
+        System.err.println("Shutting down load generator");
         e.shutdown();
     }
 
