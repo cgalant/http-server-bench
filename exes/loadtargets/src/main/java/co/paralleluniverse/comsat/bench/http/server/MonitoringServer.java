@@ -37,6 +37,7 @@ public class MonitoringServer extends Application<Configuration> {
         private static AtomicReference<Monitoring.SysStats> sysStats = new AtomicReference<>();
         private static AtomicReference<HandlerUtils.HandlerStats> handlerStats = new AtomicReference<>();
         private static AtomicLong samples = new AtomicLong(0L);
+        private static AtomicLong session = new AtomicLong(0L);
         private static boolean doSysMon = true;
 
         @Path("start") @GET public boolean start(@QueryParam("sampleIntervalMS") Long sampleIntervalMS, @QueryParam("printIntervalMS") Long printIntervalMS, @QueryParam("sysMon") Boolean sysMon) {
@@ -76,6 +77,7 @@ public class MonitoringServer extends Application<Configuration> {
                     actualPrintIntervalMS
                 );
             System.err.println (
+                "\n========================== " + session.getAndIncrement() + " ==========================\n" +
                 "Monitoring start request: sample interval = " + (actualSampleIntervalMS > 0 ? actualSampleIntervalMS + " ms" : "N/A") +
                     ", print interval = " + (actualPrintIntervalMS > 0 ? actualPrintIntervalMS + " ms" : "N/A") +
                     ", monitor system = " + doSysMon);
