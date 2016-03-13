@@ -20,8 +20,8 @@ final class ProgressLogger<Res, Exec extends AutoCloseableRequestExecutor<?, Res
   AtomicLong err = new AtomicLong(0);
 
   AtomicReference<Date>
-      start = new AtomicReference<>(),
-      end = new AtomicReference<>();
+      start = new AtomicReference<>(null),
+      end = new AtomicReference<>(null);
 
   private long notified = 0;
   private long notifiedNanos = System.nanoTime();

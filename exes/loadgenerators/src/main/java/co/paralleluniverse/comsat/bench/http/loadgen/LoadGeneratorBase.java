@@ -118,8 +118,8 @@ public abstract class LoadGeneratorBase<Req, Res, Exec extends AutoCloseableRequ
         System.err.println(
             "\n=============== LOAD GENERATOR SETTINGS ==============\n" +
                 "\t* Repetitions (-j): " + options.valueOf(j) + "\n" +
-                "\t* HTTP URL (-u): GET " + options.valueOf(u) + "\n" +
-                "\t* Monitor control base HTTP URL (-z): " + options.valueOf(z) + "\n" +
+                "\t* Server HTTP URL (-u): GET " + options.valueOf(u) + "\n" +
+                "\t* Sever monitor control base HTTP URL (-z): " + options.valueOf(z) + "\n" +
                 "\t* Shutdown server after run (-ss): " + options.valueOf(ss) + "\n" +
                 "\t" +
                 (!options.has(v) ?
