@@ -156,10 +156,14 @@ public abstract class LoadGeneratorBase<Req, Res, Exec extends AutoCloseableRequ
         env = setupEnv(options);
         final int runs = options.valueOf(j);
 
+        final AtomicBoolean statsPrinted = new AtomicBoolean(false), serverShutdown = new AtomicBoolean(false);
         final AtomicReference<Histogram> histogram = new AtomicReference<>(null);
         final AtomicReference<ProgressLogger<Res, Exec>> resExecProgressLogger = new AtomicReference<>(null);
         final AtomicReference<Date> start = new AtomicReference<>(null);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (!statsPrinted.get()) {
+                printStats(options, s, histogram.get(), start.get(), resExecProgressLogger.get());
+            }
             if (options.valueOf(ss) && !serverShutdown.get()) {
                 try {
                     System.err.println("Shutting down server");
@@ -171,6 +175,7 @@ public abstract class LoadGeneratorBase<Req, Res, Exec extends AutoCloseableRequ
             }
         }));
         for (int jj = 0 ; jj < runs ; jj++) {
+            statsPrinted.set(false);
             System.err.println("======================= (" + (jj + 1) + "/" + runs + ") ========================");
 
             histogram.set(new Histogram(options.valueOf(x), options.valueOf(d)));
@@ -237,25 +242,10 @@ public abstract class LoadGeneratorBase<Req, Res, Exec extends AutoCloseableRequ
                     e1.printStackTrace(System.err);
                 }
 
-                // More stats
-                final Date now = new Date();
-                System.err.println("[" + fmt(now) + "] Run stats:");
-                histogram.outputPercentileDistribution(System.err, options.valueOf(s));
-                System.err.println();
-                System.err.println("* Load started: " + dateFormat.format(start));
-                if (resExecProgressLogger != null) {
-                    System.err.println("* Successful requests: " + resExecProgressLogger.succ.get());
-                    System.err.println("* Failed requests: " + resExecProgressLogger.err.get());
-                    final Date firstReqEnd = resExecProgressLogger.start.get();
-                    System.err.println("* First request ended: " + dateFormat.format(firstReqEnd));
-                    final Date lastReqEnd = resExecProgressLogger.end.get();
-                    System.err.println("* Last request ended: " + dateFormat.format(lastReqEnd));
-                    System.err.println("* Seconds from load start: " + ((lastReqEnd.getTime() - start.getTime()) / 1_000.0D));
-                    System.err.println("* Seconds from first request completed: " + ((lastReqEnd.getTime() - firstReqEnd.getTime()) / 1_000.0D) + "\n");
-                } else {
-                    System.err.println("WARN: progress logger didn't start, no further stats available");
-                }
+                printStats(options, s, histogram.get(), start.get(), resExecProgressLogger.get());
+                statsPrinted.set(true);
             } catch (final Throwable e) {
+                statsPrinted.set(false);
                 System.err.println("WARNING: repetition aborted (exception follows)");
                 e.printStackTrace(System.err);
             }
@@ -269,6 +259,27 @@ public abstract class LoadGeneratorBase<Req, Res, Exec extends AutoCloseableRequ
 
         System.err.println("Shutting down load generator");
         e.shutdown();
+    }
+
+    private void printStats(OptionSet options, OptionSpec<Double> s, Histogram histogram, Date start, ProgressLogger<Res, Exec> resExecProgressLogger) {
+        // More stats
+        final Date now = new Date();
+        System.err.println("[" + fmt(now) + "] Run stats:");
+        histogram.outputPercentileDistribution(System.err, options.valueOf(s));
+        System.err.println();
+        System.err.println("* Load started: " + (start != null ? dateFormat.format(start) : "N/A"));
+        if (resExecProgressLogger != null) {
+            System.err.println("* Successful requests: " + resExecProgressLogger.succ.get());
+            System.err.println("* Failed requests: " + resExecProgressLogger.err.get());
+            final Date firstReqEnd = resExecProgressLogger.start.get();
+            System.err.println("* First request ended: " + (firstReqEnd != null ? dateFormat.format(firstReqEnd) : "N/A"));
+            final Date lastReqEnd = resExecProgressLogger.end.get();
+            System.err.println("* Last request ended: " + (lastReqEnd != null ? dateFormat.format(lastReqEnd) : "N/A"));
+            System.err.println("* Seconds from load start: " + (lastReqEnd != null && start != null ? ((lastReqEnd.getTime() - start.getTime()) / 1_000.0D) : "N/A"));
+            System.err.println("* Seconds from first request completed: " + (lastReqEnd != null && firstReqEnd != null ? ((lastReqEnd.getTime() - firstReqEnd.getTime()) / 1_000.0D) : "N/A") + "\n");
+        } else {
+            System.err.println("WARN: progress logger didn't start, no further stats available");
+        }
     }
 
     private void restartMonitoring(String baseMonitoringURL, String startMonitoringURL) throws IOException {
