@@ -7,9 +7,14 @@ public final class Main {
     }
 
     private static final class ClogTextTransformer extends LogParser {
-        private final static String SEP = "|";
+        private final static String SEP = ",";
+        private final static String QUOTE = "\"";
 
-        private final static String HEAD = "Mean (ms)|Max (ms)|Start|Successful (#)|Failed (#)|First end|Last end|Time from start (s)|Time from first end (s)";
+        private final static String HEAD =
+            quote(QUOTE, "Mean (ms)") + SEP + quote(QUOTE, "Max (ms)") + SEP + quote(QUOTE, "Start") + SEP +
+            quote(QUOTE, "Successful (#)") + SEP + quote(QUOTE, "Failed (#)") + SEP + quote(QUOTE, "First end") + SEP +
+            quote(QUOTE, "Last end") + SEP + quote(QUOTE, "Time from start (s)") + SEP +
+            quote(QUOTE, "Time from first end (s)");
 
         private final static String MEAN = "#[Mean    =";
         private final static String MAX = "#[Max     =";
@@ -30,23 +35,23 @@ public final class Main {
         @Override
         public final String transformLine0(String l) throws Exception {
             if (l.startsWith(MEAN)) {
-                csvLine += getString(l, MEAN, ",") + SEP;
+                csvLine += quote(QUOTE, getString(l, MEAN, ",")) + SEP;
             } else if (l.startsWith(MAX)) {
-                csvLine += getString(l, MAX, ",") + SEP;
+                csvLine += quote(QUOTE, getString(l, MAX, ",")) + SEP;
             } else if (l.startsWith(LOAD_STARTED)) {
-                csvLine += getString(l, LOAD_STARTED) + SEP;
+                csvLine += quote(QUOTE, "'" + getString(l, LOAD_STARTED)) + SEP;
             } else if (l.startsWith(SUCCESSFUL_REQUESTS)) {
-                csvLine += getString(l, SUCCESSFUL_REQUESTS) + SEP;
+                csvLine += quote(QUOTE, getString(l, SUCCESSFUL_REQUESTS)) + SEP;
             } else if (l.startsWith(FAILED_REQUESTS)) {
-                csvLine += getString(l, FAILED_REQUESTS) + SEP;
+                csvLine += quote(QUOTE, getString(l, FAILED_REQUESTS)) + SEP;
             } else if (l.startsWith(FIRST_REQUEST_ENDED)) {
-                csvLine += getString(l, FIRST_REQUEST_ENDED) + SEP;
+                csvLine += quote(QUOTE, "'" + getString(l, FIRST_REQUEST_ENDED)) + SEP;
             } else if (l.startsWith(LAST_REQUEST_ENDED)) {
-                csvLine += getString(l, LAST_REQUEST_ENDED) + SEP;
+                csvLine += quote(QUOTE, "'" + getString(l, LAST_REQUEST_ENDED)) + SEP;
             } else if (l.startsWith(SECONDS_FROM_LOAD_START)) {
-                csvLine += getString(l, SECONDS_FROM_LOAD_START) + SEP;
+                csvLine += quote(QUOTE, getString(l, SECONDS_FROM_LOAD_START)) + SEP;
             } else if (l.startsWith(SECONDS_FROM_FIRST_REQUEST_COMPLETED)) {
-                csvLine += getString(l, SECONDS_FROM_FIRST_REQUEST_COMPLETED);
+                csvLine += quote(QUOTE, getString(l, SECONDS_FROM_FIRST_REQUEST_COMPLETED));
                 final String ret = csvLine;
                 csvLine = "";
                 return ret;

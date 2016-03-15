@@ -110,4 +110,8 @@ public abstract class LogParser extends TextTransformerVisitor {
     protected static String getString(String l, String startMarker) {
         return getString(l, startMarker, null);
     }
+
+    protected static String quote(String q, String s) {
+        return q + s + q;
+    }
 }
