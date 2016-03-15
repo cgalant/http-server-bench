@@ -1,0 +1,7 @@
+dependencies {
+    compile "co.paralleluniverse:quasar-core:$quasarVer"
+
+    compile project(":libs:text")
+}
+
+fatCapsule.enabled = false

@@ -1,10 +1,15 @@
 include 'libs'
 
+include 'libs:text'
+
 include 'libs:servers'
 include 'libs:serverhandlers'
 
-
 include 'exes'
+
+include 'exes:logparsers'
+include 'exes:logparsers:clog-csv-extractor'
+include 'exes:logparsers:slog-csv-extractor'
 
 include 'exes:loadgenerators'
 include 'exes:loadgenerators:jbender-okhttp-fiber'
