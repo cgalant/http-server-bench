@@ -74,6 +74,8 @@ allprojects {
             force "org.glassfish.hk2:hk2-locator:2.4.0-b34"
             force "org.glassfish.hk2.external:javax.inject:2.4.0-b34"
             force "com.google.guava:guava:19.0"
+
+            force "com.fasterxml.jackson.core:jackson-annotations:2.7.3"
 //
 //            force "org.clojure:clojure:$clojureVer"
 //            force "co.paralleluniverse:pulsar:$quasarVer"

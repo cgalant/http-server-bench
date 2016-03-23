@@ -9,6 +9,7 @@ include 'exes'
 
 include 'exes:logparsers'
 include 'exes:logparsers:clog-csv-extractor'
+include 'exes:logparsers:clog-hist-extractor'
 include 'exes:logparsers:slog-csv-extractor'
 
 include 'exes:loadgenerators'

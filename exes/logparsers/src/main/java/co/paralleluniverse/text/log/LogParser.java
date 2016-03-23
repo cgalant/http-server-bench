@@ -102,7 +102,7 @@ public abstract class LogParser extends TextTransformerVisitor {
     }
 
     protected static String getString(String l, String startMarker, String endMarker) {
-        int startIdx = l.indexOf(startMarker) + startMarker.length();
+        final int startIdx = startMarker != null ? l.indexOf(startMarker) + startMarker.length() : 0;
         final String startStr = l.substring(startIdx);
         return (endMarker != null ? startStr.substring(0, startStr.indexOf(endMarker)) : startStr).trim();
     }
