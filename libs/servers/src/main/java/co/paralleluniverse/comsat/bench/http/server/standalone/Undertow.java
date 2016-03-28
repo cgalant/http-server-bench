@@ -26,6 +26,8 @@ public final class Undertow {
 
             .setIoThreads(maxIOP)
             .setWorkerThreads(maxWorkP)
+            .setServerOption(Options.CONNECTION_HIGH_WATER, 100_000)
+            .setServerOption(Options.CONNECTION_LOW_WATER, 100_000)
 
             .setDirectBuffers(true)
             .setBufferSize(1024)
@@ -36,6 +38,7 @@ public final class Undertow {
             // .setSocketOption(Options.CORK, true)
             // .setSocketOption(Options.USE_DIRECT_BUFFERS, true)
             .setSocketOption(Options.BACKLOG, backlog)
+            .setSocketOption(Options.TCP_NODELAY, true)
             // .setSocketOption(Options.RECEIVE_BUFFER, 2048)
             // .setSocketOption(Options.SEND_BUFFER, 2048)
             // .setSocketOption(Options.CONNECTION_HIGH_WATER, Integer.MAX_VALUE)
