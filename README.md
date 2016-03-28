@@ -3,6 +3,11 @@ Build all with `gradle fatCapsule`.
 Load generator env vars (fill):
 
 ``` bash
+# LOADTARGET SYSTEM
+
+export JVMARGS="-Dco.paralleluniverse.fibers.detectRunawayFibers=false -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncExceptions=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableSyncForward=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableJettyAsyncFixes=true -Dco.paralleluniverse.fibers.servlet.FiberHttpServlet.disableTomcatAsyncFixes=true -server -XX:+AggressiveOpts -XX:+DisableExplicitGC -XX:+HeapDumpOnOutOfMemoryError -Xms4G -Xmx4G"
+
+
 # LOADGEN SYSTEM
 
 export JVMARGS="-server -XX:+AggressiveOpts -XX:+DisableExplicitGC -XX:+HeapDumpOnOutOfMemoryError -Xms12G -Xmx12G -XX:+UseG1GC -XX:MaxGCPauseMillis=10"
@@ -44,7 +49,7 @@ export SERVER_TECH=jetty-handler-async-dispatch
 
 # export SERVER_TECH=webactor-native-netty-single
 # export SERVER_TECH=webactor-native-netty-per-session
-
+# export SERVER_TECH=webactor-native-undertow-per-session
 
 
 # PER TECH
