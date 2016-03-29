@@ -28,9 +28,19 @@ public final class Main extends UndertowAsyncLoadTargetBase {
         }
 
         private static class MyDefaultContextImpl extends WebActorHandler.DefaultContextImpl {
+            @Override
+            public String getId() {
+                return "CONSTANT";
+            }
+
+            @Override
+            public void restart(HttpServerExchange xch) {
+                // Nothing to do
+            }
+
             @SuppressWarnings("unchecked")
             @Override
-            public final ActorRef<? extends WebMessage> getRef() {
+            public final ActorRef<? extends WebMessage> getWebActor() {
                 return actorRef;
             }
 
@@ -45,8 +55,8 @@ public final class Main extends UndertowAsyncLoadTargetBase {
             }
 
             @Override
-            public final boolean watch() {
-                return false;
+            public final WebActorHandler.Context.WatchPolicy watch() {
+                return WatchPolicy.DIE;
             }
         }
     }
